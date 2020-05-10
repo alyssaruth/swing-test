@@ -4,7 +4,7 @@ import javax.swing.JComponent
 import javax.swing.KeyStroke
 
 fun Component.doClick(x: Int = 0, y: Int = 0) {
-    val me = makeMouseEvent(x = x, y = y, component = this)
+    val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach {
         it.mouseClicked(me)
         it.mouseReleased(me)
@@ -12,7 +12,7 @@ fun Component.doClick(x: Int = 0, y: Int = 0) {
 }
 
 fun Component.doubleClick() {
-    val me = makeMouseEvent(x = x, y = y, component = this, clickCount = 2)
+    val me = makeMouseEvent(this, x = x, y = y, clickCount = 2)
     mouseListeners.forEach {
         it.mouseClicked(me)
         it.mouseReleased(me)
@@ -20,17 +20,17 @@ fun Component.doubleClick() {
 }
 
 fun Component.doHover(x: Int = 0, y: Int = 0) {
-    val me = makeMouseEvent(x = x, y = y, component = this)
+    val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach { it.mouseEntered(me) }
 }
 
 fun Component.doHoverAway(x: Int = 0, y: Int = 0) {
-    val me = makeMouseEvent(x = x, y = y, component = this)
+    val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach { it.mouseExited(me) }
 }
 
 fun Component.doMouseMove() {
-    val me = makeMouseEvent(x = x, y = y, component = this)
+    val me = makeMouseEvent(this, x = x, y = y)
     mouseMotionListeners.forEach { it.mouseMoved(me) }
 }
 
