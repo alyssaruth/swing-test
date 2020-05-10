@@ -11,7 +11,7 @@ fun Component.doClick(x: Int = 0, y: Int = 0) {
     }
 }
 
-fun Component.doubleClick() {
+fun Component.doubleClick(x: Int = 0, y: Int = 0) {
     val me = makeMouseEvent(this, x = x, y = y, clickCount = 2)
     mouseListeners.forEach {
         it.mouseClicked(me)
