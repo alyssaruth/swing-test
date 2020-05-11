@@ -10,6 +10,13 @@ import javax.swing.JComponent
 const val ENV_UPDATE_SNAPSHOT = "updateSnapshots"
 const val ENV_SCREENSHOT_OS = "screenshotOs"
 
+fun JComponent.toBufferedImage(): BufferedImage {
+    val img = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
+    val g2 = img.createGraphics()
+    paint(g2)
+    return img
+}
+
 fun JComponent.shouldMatchImage(imageName: String) {
     val overwrite = System.getenv(ENV_UPDATE_SNAPSHOT) == "true"
     val osForScreenshots = (System.getenv(ENV_SCREENSHOT_OS) ?: "").toLowerCase(Locale.ENGLISH)
@@ -22,9 +29,7 @@ fun JComponent.shouldMatchImage(imageName: String) {
         )
     }
 
-    val img = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
-    val g2 = img.createGraphics()
-    paint(g2)
+    val img = toBufferedImage()
 
     val callingSite = Throwable().stackTrace[1].className
     val imgPath = "src/test/resources/__snapshots__/$callingSite"
@@ -49,12 +54,12 @@ fun JComponent.shouldMatchImage(imageName: String) {
     }
 }
 
-private fun BufferedImage.isEqual(other: BufferedImage): Boolean {
+fun BufferedImage.isEqual(other: BufferedImage): Boolean {
     if (width != other.width || height != other.height) return false
     return getPointList(width, height).all { getRGB(it.x, it.y) == other.getRGB(it.x, it.y) }
 }
 
-private fun getPointList(width: Int, height: Int): List<Point> {
+fun getPointList(width: Int, height: Int): List<Point> {
     val yRange = 0 until height
     val xRange = 0 until width
 
