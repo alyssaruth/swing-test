@@ -21,11 +21,13 @@ fun Component.doubleClick(x: Int = 0, y: Int = 0) {
     }
 }
 
+@JvmOverloads
 fun Component.doHover(x: Int = 0, y: Int = 0) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach { it.mouseEntered(me) }
 }
 
+@JvmOverloads
 fun Component.doHoverAway(x: Int = 0, y: Int = 0) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach { it.mouseExited(me) }
