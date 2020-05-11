@@ -18,17 +18,9 @@ fun JComponent.toBufferedImage(): BufferedImage {
 }
 
 fun JComponent.shouldMatchImage(imageName: String) {
+    verifyOs()
+
     val overwrite = System.getenv(ENV_UPDATE_SNAPSHOT) == "true"
-    val osForScreenshots = (System.getenv(ENV_SCREENSHOT_OS) ?: "").toLowerCase(Locale.ENGLISH)
-
-    val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
-    if (osForScreenshots.isNotEmpty()) {
-        Assume.assumeTrue(
-            "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)",
-            os.contains(osForScreenshots)
-        )
-    }
-
     val img = toBufferedImage()
 
     val callingSite = Throwable().stackTrace[1].className
@@ -36,7 +28,7 @@ fun JComponent.shouldMatchImage(imageName: String) {
 
     val file = File("$imgPath/$imageName.png")
     if (!file.exists() && !overwrite) {
-        fail("Snapshot image not found: ${file.path}. Run with env var updateSnapshots=true to write for the first time.")
+        fail("Snapshot image not found: $imgPath/$imageName.png. Run with env var updateSnapshots=true to write for the first time.")
     }
 
     file.mkdirs()
@@ -49,8 +41,20 @@ fun JComponent.shouldMatchImage(imageName: String) {
         if (!match) {
             val failedFile = File("$imgPath/$imageName.failed.png")
             ImageIO.write(img, "png", failedFile)
-            fail("Snapshot image did not match: ${file.path}. Run with env var updateSnapshots=true to overwrite.")
+            fail("Snapshot image did not match: $imgPath/$imageName.png. Run with env var updateSnapshots=true to overwrite.")
         }
+    }
+}
+
+private fun verifyOs() {
+    val osForScreenshots = (System.getenv(ENV_SCREENSHOT_OS) ?: "").toLowerCase(Locale.ENGLISH)
+
+    val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+    if (osForScreenshots.isNotEmpty()) {
+        Assume.assumeTrue(
+            "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)",
+            os.contains(osForScreenshots)
+        )
     }
 }
 
