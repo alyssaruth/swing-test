@@ -3,6 +3,7 @@ import java.awt.event.FocusEvent
 import javax.swing.JComponent
 import javax.swing.KeyStroke
 
+@JvmOverloads
 fun Component.doClick(x: Int = 0, y: Int = 0) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach {
@@ -11,6 +12,7 @@ fun Component.doClick(x: Int = 0, y: Int = 0) {
     }
 }
 
+@JvmOverloads
 fun Component.doubleClick(x: Int = 0, y: Int = 0) {
     val me = makeMouseEvent(this, x = x, y = y, clickCount = 2)
     mouseListeners.forEach {
