@@ -14,7 +14,10 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation "io.kotlintest:kotlintest-assertions:3.4.2"
+    implementation "org.jetbrains.kotlin:kotlin-test-junit"
 
+    testImplementation 'com.github.stefanbirkner:system-rules:1.19.0'
     testImplementation "io.mockk:mockk:1.9.3"
     testImplementation "io.kotlintest:kotlintest-assertions:3.4.2"
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit'
