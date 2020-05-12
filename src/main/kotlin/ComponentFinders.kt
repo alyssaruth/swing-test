@@ -33,6 +33,7 @@ class MultipleComponentsException(override val message: String?) : Exception(mes
  * @throws MultipleComponentsException if more than one component is found
  * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
  */
+@JvmOverloads
 inline fun <reified T : Component> Container.find(
     text: String? = null,
     toolTipText: String? = null,
