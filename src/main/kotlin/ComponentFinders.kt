@@ -1,11 +1,13 @@
 import java.awt.Component
 import java.awt.Container
 
-inline fun <reified T> Container.findAll(): List<T> {
+inline fun <reified T> Container.findAll(): List<T>  = findAll(T::class.java)
+
+fun <T> Container.findAll(clazz: Class<T>): List<T> {
     val ret = mutableListOf<T>()
 
     val components = components
-    addComponents(ret, components, T::class.java)
+    addComponents(ret, components, clazz)
 
     return ret
 }
