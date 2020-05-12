@@ -1,6 +1,5 @@
 import java.awt.Component
 import java.awt.Container
-import javax.swing.JComponent
 
 inline fun <reified T> Container.findAll(): List<T> {
     val ret = mutableListOf<T>()
@@ -25,20 +24,34 @@ fun <T> addComponents(ret: MutableList<T>, components: Array<Component>, desired
     }
 }
 
-inline fun <reified T : JComponent> Container.find(text: String? = null, toolTipText: String? = null): T? {
+class MultipleComponentsException(override val message: String?) : Exception(message)
+
+/**
+ * @param text: If non-null, filter to components with a text field containing the specified String
+ * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
+ *
+ * @throws MultipleComponentsException if more than one component is found
+ * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
+ */
+inline fun <reified T : Component> Container.find(
+    text: String? = null,
+    toolTipText: String? = null,
+    noinline filterFn: ((T) -> Boolean)? = null
+): T? {
     val allComponents = findAll<T>()
 
     var filtered = filterByField(allComponents, "Text", text)
     filtered = filterByField(filtered, "ToolTipText", toolTipText)
+    filterFn?.let { filtered = filtered.filter { filterFn(it) } }
 
     if (filtered.size > 1) {
-        throw Exception("Non-unique class - ${allComponents.size} ${T::class.simpleName}s found")
+        throw MultipleComponentsException("Found ${filtered.size} ${T::class.simpleName}s, expected 1 or 0. Text [$text], ToolTipText [$toolTipText]")
     }
 
-    return allComponents.firstOrNull()
+    return filtered.firstOrNull()
 }
 
-inline fun <reified T : JComponent> filterByField(components: List<T>, fieldName: String, match: String?): List<T> {
+inline fun <reified T : Component> filterByField(components: List<T>, fieldName: String, match: String?): List<T> {
     match ?: return components
 
     val instanceClass = T::class.java
@@ -46,9 +59,9 @@ inline fun <reified T : JComponent> filterByField(components: List<T>, fieldName
     return components.filter {
         val result = getter.invoke(it)
         if (result !is String) {
-            throw Exception("wah")
+            throw NoSuchMethodException("$instanceClass.get$fieldName exists, but has non-String return type: ${getter.returnType}")
         }
 
-        result.contains(match, ignoreCase = true)
+        result == match
     }
 }
