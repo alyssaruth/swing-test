@@ -1,9 +1,13 @@
 package com.github.alexburlton.swingtest
 
 import io.kotlintest.matchers.collections.shouldContainExactly
+import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.Test
+import java.awt.event.ActionListener
 import javax.swing.*
 
 class ComponentFindersTest {
@@ -174,5 +178,34 @@ class ComponentFindersTest {
 
         @Suppress("unused")
         panel.findChild<JButton>(text = "Button Text", toolTipText = "Yes") { it.isEnabled } shouldBe expected
+    }
+
+    @Test
+    fun `Should handle an absent child component correctly`() {
+        val panel = JPanel()
+        panel.findChild<JButton>().shouldBeNull()
+
+        shouldThrow<NoSuchComponentException> {
+            panel.getChild<JButton>()
+        }
+    }
+
+    @Test
+    fun `Should click a child button and trigger its ActionListeners`() {
+        val panel = JPanel()
+        val buttonA = JButton("A")
+        val buttonB = JButton("B")
+        val listenerA = mockk<ActionListener>(relaxed = true)
+        val listenerB = mockk<ActionListener>(relaxed = true)
+
+        buttonA.addActionListener(listenerA)
+        buttonB.addActionListener(listenerB)
+        panel.add(buttonA)
+        panel.add(buttonB)
+
+        panel.clickChild<JButton>("A")
+
+        verify { listenerA.actionPerformed(any()) }
+        verifyNotCalled { listenerB.actionPerformed(any()) }
     }
 }

@@ -2,6 +2,7 @@ package com.github.alexburlton.swingtest
 
 import java.awt.Component
 import java.awt.Container
+import javax.swing.AbstractButton
 
 /**
  * Finds all child components of a given type, recursing through child containers.
@@ -166,7 +167,7 @@ fun <T : Component> Container.getChild(
  * @throws MultipleComponentsException if more than one component is found
  * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
  */
-inline fun <reified T : Component> Container.clickChild(
+inline fun <reified T : AbstractButton> Container.clickChild(
     text: String? = null,
     toolTipText: String? = null,
     noinline filterFn: ((T) -> Boolean)? = null
@@ -188,7 +189,7 @@ inline fun <reified T : Component> Container.clickChild(
  * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
  */
 @JvmOverloads
-fun <T : Component> Container.clickChild(
+fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
     text: String? = null,
     toolTipText: String? = null,
