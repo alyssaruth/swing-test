@@ -153,3 +153,46 @@ fun <T : Component> Container.getChild(
     filterFn: ((T) -> Boolean)? = null
 ): T = findChild(clazz, text, toolTipText, filterFn)
     ?: throw NoSuchComponentException("Found 0 ${clazz.simpleName}s. Text [$text], ToolTipText [$toolTipText]")
+
+/**
+ * Simulate a click on a child component, recursing through child containers.
+ *
+ * @param T: The class of component to look for
+ * @param text: If non-null, filter to components with a text field containing the specified String
+ * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
+ * @param filterFn: Lambda argument to allow custom additional filters to be imposed
+ *
+ * @throws NoSuchComponentException if no matching component is found
+ * @throws MultipleComponentsException if more than one component is found
+ * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
+ */
+inline fun <reified T : Component> Container.clickChild(
+    text: String? = null,
+    toolTipText: String? = null,
+    noinline filterFn: ((T) -> Boolean)? = null
+) {
+    clickChild(T::class.java, text, toolTipText, filterFn)
+}
+
+/**
+ * Simulate a click on a child component, recursing through child containers.
+ * Non reified version for calling from Java.
+ *
+ * @param clazz: The class of component to look for
+ * @param text: If non-null, filter to components with a text field containing the specified String
+ * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
+ * @param filterFn: Lambda argument to allow custom additional filters to be imposed
+ *
+ * @throws NoSuchComponentException if no matching component is found
+ * @throws MultipleComponentsException if more than one component is found
+ * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
+ */
+@JvmOverloads
+fun <T : Component> Container.clickChild(
+    clazz: Class<T>,
+    text: String? = null,
+    toolTipText: String? = null,
+    filterFn: ((T) -> Boolean)? = null
+) {
+    getChild(clazz, text, toolTipText, filterFn).doClick()
+}
