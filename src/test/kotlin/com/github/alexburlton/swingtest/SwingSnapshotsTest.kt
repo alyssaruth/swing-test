@@ -130,6 +130,35 @@ class SwingSnapshotsTest {
     }
 
     @Test
+    fun `Should write a snapshot of the correct size`() {
+        val labelA = JLabel("A")
+        labelA.size = Dimension(500, 15)
+
+        val labelB = JLabel("B")
+        labelB.preferredSize = Dimension(400, 25)
+
+        val labelC = JLabel("C")
+        labelC.preferredSize = Dimension(0, 0)
+
+        labelA.createImageFile("A")
+        labelB.createImageFile("B")
+        labelC.createImageFile("C")
+
+        val fileA = File("$resourceLocation/A.png")
+        val fileB = File("$resourceLocation/B.png")
+        val fileC = File("$resourceLocation/C.png")
+
+        ImageIO.read(fileA).width shouldBe 500
+        ImageIO.read(fileA).height shouldBe 15
+
+        ImageIO.read(fileB).width shouldBe 400
+        ImageIO.read(fileB).height shouldBe 25
+
+        ImageIO.read(fileC).width shouldBe 200
+        ImageIO.read(fileC).height shouldBe 200
+    }
+
+    @Test
     fun `Should generate a list of points from a width and height`() {
         val points = getPointList(3, 2)
         points.shouldContainExactly(Point(0, 0), Point(1, 0), Point(2, 0), Point(0, 1), Point(1, 1), Point(2, 1))

@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.github.alexburlton'
-version '0.1.0'
+version '0.2.0'
 
 sourceCompatibility = 1.8
 
@@ -45,6 +45,11 @@ test {
         exceptionFormat "short"
         info.events = ["failed", "skipped"]
     }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
 publishing {
@@ -97,6 +102,7 @@ bintray {
     key = project.findProperty("bintrayKey").toString()
 
     publications = ['SwingTestPublication']
+    publish = true
 
     pkg {
         repo = "swing-test"

@@ -103,11 +103,7 @@ private fun <T : Component> filterByField(
     val getter = clazz.getMethod("get$fieldName")
     return components.filter {
         val result = getter.invoke(it)
-        if (result !is String) {
-            throw NoSuchMethodException("${clazz.simpleName}.get$fieldName exists, but has non-String return type: ${getter.returnType}")
-        }
-
-        result == match
+        "$result" == match
     }
 }
 

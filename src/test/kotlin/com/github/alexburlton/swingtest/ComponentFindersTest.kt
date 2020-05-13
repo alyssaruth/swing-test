@@ -91,21 +91,6 @@ class ComponentFindersTest {
         e.message shouldBe "javax.swing.JPanel.getText()"
     }
 
-    @Suppress("unused")
-    class BogusComponent(val text: Int) : JComponent()
-
-    @Test
-    fun `Should throw a NoSuchMethodException if the text field is not a String`() {
-        val panel = JPanel()
-        panel.add(BogusComponent(5))
-
-        val e = shouldThrow<NoSuchMethodException> {
-            panel.findChild<BogusComponent>(text = "Foo")
-        }
-
-        e.message shouldBe "class com.github.alexburlton.swingtest.ComponentFindersTest\$BogusComponent.getText exists, but has non-String return type: int"
-    }
-
     @Test
     fun `Should filter by text correctly`() {
         val panel = JPanel()
