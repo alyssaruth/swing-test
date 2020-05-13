@@ -51,7 +51,7 @@ class ComponentFindersTest {
         panel.add(buttonB)
 
         val e = shouldThrow<MultipleComponentsException> {
-            panel.find<JButton>()
+            panel.findChild<JButton>()
         }
 
         e.message shouldBe "Found 2 JButtons, expected 1 or 0. Text [null], ToolTipText [null]"
@@ -70,7 +70,7 @@ class ComponentFindersTest {
         panel.add(buttonB)
 
         val e = shouldThrow<MultipleComponentsException> {
-            panel.find<JButton>(text = "Button", toolTipText = "Click me")
+            panel.findChild<JButton>(text = "Button", toolTipText = "Click me")
         }
 
         e.message shouldBe "Found 2 JButtons, expected 1 or 0. Text [Button], ToolTipText [Click me]"
@@ -81,7 +81,7 @@ class ComponentFindersTest {
         val panel = JPanel()
 
         val e = shouldThrow<NoSuchMethodException> {
-            panel.find<JPanel>(text = "Foo")
+            panel.findChild<JPanel>(text = "Foo")
         }
 
         e.message shouldBe "javax.swing.JPanel.getText()"
@@ -96,7 +96,7 @@ class ComponentFindersTest {
         panel.add(BogusComponent(5))
 
         val e = shouldThrow<NoSuchMethodException> {
-            panel.find<BogusComponent>(text = "Foo")
+            panel.findChild<BogusComponent>(text = "Foo")
         }
 
         e.message shouldBe "class com.github.alexburlton.swingtest.ComponentFindersTest\$BogusComponent.getText exists, but has non-String return type: int"
@@ -110,9 +110,9 @@ class ComponentFindersTest {
         panel.add(buttonA)
         panel.add(buttonB)
 
-        panel.find<JButton>(text = "Foo") shouldBe buttonA
-        panel.find<JButton>(text = "Bar") shouldBe buttonB
-        panel.find<JButton>(text = "Baz") shouldBe null
+        panel.findChild<JButton>(text = "Foo") shouldBe buttonA
+        panel.findChild<JButton>(text = "Bar") shouldBe buttonB
+        panel.findChild<JButton>(text = "Baz") shouldBe null
     }
 
     @Test
@@ -126,9 +126,9 @@ class ComponentFindersTest {
         labelA.toolTipText = "Label 1"
         labelB.toolTipText = "Label 2"
 
-        panel.find<JLabel>(toolTipText = "Label 1") shouldBe labelA
-        panel.find<JLabel>(toolTipText = "Label 2") shouldBe labelB
-        panel.find<JLabel>(toolTipText = "zz") shouldBe null
+        panel.findChild<JLabel>(toolTipText = "Label 1") shouldBe labelA
+        panel.findChild<JLabel>(toolTipText = "Label 2") shouldBe labelB
+        panel.findChild<JLabel>(toolTipText = "zz") shouldBe null
     }
 
     @Test
@@ -142,8 +142,8 @@ class ComponentFindersTest {
         buttonA.isEnabled = true
         buttonB.isEnabled = false
 
-        panel.find<JButton> { it.isEnabled } shouldBe buttonA
-        panel.find<JButton> { !it.isEnabled } shouldBe buttonB
+        panel.findChild<JButton> { it.isEnabled } shouldBe buttonA
+        panel.findChild<JButton> { !it.isEnabled } shouldBe buttonB
     }
 
     @Test
@@ -173,6 +173,6 @@ class ComponentFindersTest {
         panel.add(disabled)
 
         @Suppress("unused")
-        panel.find<JButton>(text = "Button Text", toolTipText = "Yes") { it.isEnabled } shouldBe expected
+        panel.findChild<JButton>(text = "Button Text", toolTipText = "Yes") { it.isEnabled } shouldBe expected
     }
 }
