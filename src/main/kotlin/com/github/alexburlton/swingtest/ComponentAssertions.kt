@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.shouldBe
 import javax.swing.JComponent
 

@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.Test

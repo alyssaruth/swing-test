@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -8,7 +10,7 @@ import javax.swing.*;
 import java.io.File;
 
 public class SwingSnapshotsInteropTest {
-    private String resourceLocation = "src/test/resources/__snapshots__/SwingSnapshotsInteropTest";
+    private String resourceLocation = "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsInteropTest";
 
     @Rule
     public EnvironmentVariables environmentVariables = new EnvironmentVariables();

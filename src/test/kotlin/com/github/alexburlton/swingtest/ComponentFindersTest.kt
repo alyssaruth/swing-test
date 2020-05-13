@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
@@ -97,7 +99,7 @@ class ComponentFindersTest {
             panel.find<BogusComponent>(text = "Foo")
         }
 
-        e.message shouldBe "class ComponentFindersTest\$BogusComponent.getText exists, but has non-String return type: int"
+        e.message shouldBe "class com.github.alexburlton.swingtest.ComponentFindersTest\$BogusComponent.getText exists, but has non-String return type: int"
     }
 
     @Test

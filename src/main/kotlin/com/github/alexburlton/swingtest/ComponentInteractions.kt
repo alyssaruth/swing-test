@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import java.awt.Component
 import java.awt.event.FocusEvent
 import javax.swing.JComponent

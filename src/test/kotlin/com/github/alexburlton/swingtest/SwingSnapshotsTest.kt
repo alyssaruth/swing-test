@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.matchers.file.shouldExist
 import io.kotlintest.matchers.file.shouldNotExist
@@ -17,7 +19,8 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 
 class SwingSnapshotsTest {
-    private val resourceLocation = "src/test/resources/__snapshots__/SwingSnapshotsTest"
+    private val resourceLocation =
+        "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsTest"
     private val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 
     @Rule

@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.fail
 import org.junit.Assume
 import java.awt.Point
