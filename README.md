@@ -8,7 +8,7 @@ swing-test is an idiomatic testing library for Java Swing components, developed 
 Test components with ease
 -------------------------
 
-Write simple assertions for Swing components, using the `StringSpec` style. and inspired by [kotest](https://github.com/kotest/kotest):
+Write simple assertions for Swing components, using the `StringSpec` style. 
 
 ```kotlin
     @Test
@@ -20,10 +20,57 @@ Write simple assertions for Swing components, using the `StringSpec` style. and 
     }
 ```
 
-Screenshot Testing :camera_flash:
----------------------------------
+Easily automate common interactions:
 
+```
+val label = JLabel()
+label.doHover() //fires mouseEntered on listeners
+label.doHoverAway() //fires mouseExited
+label.doubleClick() //simulates mouseClicked/mouseReleased, with clickCount = 2
 
+val table = JTable()
+table.simulateKeyPress(KeyEvent.VK_ENTER) //Simulate the enter key being pressed
+```
+
+Use in-built finders to interact with child components without having to expose them directly. In-built support for narrowing by `class`, `text` and `toolTipText`, as well as the ability to specify your own lambda for more complex cases:
+
+```
+val myContainer = MyContainer()
+myContainer.findChild<JButton>(text = "Cancel").shouldBeNull()
+myContainer.getChild<JLabel>(toolTipText = "Avatar").shouldBeVisible()
+
+// Custom example
+myContainer.clickChild<JRadioButton> { it.text.contains("foo") }
+```
+
+Snapshot Testing :camera_flash:
+-------------------------------
+
+swing-test provides a simple one-line approach for verifying that components match a generated `png` snapshot file. This is particularly useful for testing components with custom painting logic, which can otherwise be hard to verify:
+
+```kotlin
+    @Test
+    fun `Should match snapshot - locked`()
+    {
+        val achievement = AchievementMedal(AchievementStatus.LOCKED)
+        achievement.shouldMatchImage("locked")
+    }
+
+    @Test
+    fun `Should match snapshot - red`()
+    {
+        val achievement = AchievementMedal(AchievementStatus.RED)
+        medal.shouldMatchImage("red")
+    }
+```
+
+Snapshot images are automatically written to `src/test/resources/__snapshots__/your/package/structure/test-class/imageName.png`, for example:
+
+![image](https://user-images.githubusercontent.com/5732536/81931594-43270680-95e2-11ea-8a3f-aef01b91ab31.png)
+
+ - Running with the environment variable `updateSnapshots=true` allows the image files to be created for the first time, or updated locally in the event of a deliberate change.
+ - When a snapshot comparison fails, the failed image file is written out with the same name and a `failed.png` extension, to allow easy manual inspection.
+ - Due to pixel differences caused by running on different operating systems, you may optionally specify a `screenshotOs` environment variable, e.g. `screenshotOs=linux`. This will cause any screenshot tests to be skipped when run on a different operating system.
 
 Fully interoperable with Java
 -----------------------------
