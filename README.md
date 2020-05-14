@@ -20,17 +20,8 @@ Write simple assertions for Swing components, using the `StringSpec` style.
     }
 ```
 
-Easily automate common interactions:
-
-```
-val label = JLabel()
-label.doHover() //fires mouseEntered on listeners
-label.doHoverAway() //fires mouseExited
-label.doubleClick() //simulates mouseClicked/mouseReleased, with clickCount = 2
-
-val table = JTable()
-table.simulateKeyPress(KeyEvent.VK_ENTER) //Simulate the enter key being pressed
-```
+Easily interact with parts of a layout
+--------------------------------------
 
 Use in-built finders to interact with child components without having to expose them directly. In-built support for narrowing by `class`, `text` and `toolTipText`, as well as the ability to specify your own lambda for more complex cases:
 
@@ -41,6 +32,18 @@ myContainer.getChild<JLabel>(toolTipText = "Avatar").shouldBeVisible()
 
 // Custom example
 myContainer.clickChild<JRadioButton> { it.text.contains("foo") }
+```
+
+Easily automate common interactions once you have a reference to the component you're after:
+
+```
+val label = myContainer.getChild<JLabel>()
+label.doHover() //fires mouseEntered on listeners
+label.doHoverAway() //fires mouseExited
+label.doubleClick() //simulates mouseClicked/mouseReleased, with clickCount = 2
+
+val table = myContainer.getChild<JTable>()
+table.simulateKeyPress(KeyEvent.VK_ENTER) //Simulate the enter key being pressed
 ```
 
 Snapshot Testing :camera_flash:
