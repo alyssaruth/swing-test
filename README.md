@@ -20,8 +20,8 @@ fun `Should enable Ok button once terms have been read`() {
 }
 ```
 
-Easily interact with parts of a layout
---------------------------------------
+Easily interact with whole layouts
+----------------------------------
 
 Use in-built finders to interact with child components without having to expose them directly. Out-the-box support for narrowing by `class`, `text` and `toolTipText`, plus the ability to specify your own lambda for more complex cases:
 
