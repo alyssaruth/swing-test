@@ -34,7 +34,7 @@ myContainer.getChild<JLabel>(toolTipText = "Avatar").shouldBeVisible()
 myContainer.clickChild<JRadioButton> { it.text.contains("foo") }
 ```
 
-Easily automate common interactions once you have a reference to the component you're after:
+Simulate common interactions once you have a reference to the component you're after:
 
 ```
 val label = myContainer.getChild<JLabel>()
