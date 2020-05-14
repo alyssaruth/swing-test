@@ -11,19 +11,19 @@ Test components with ease
 Write simple assertions for Swing components, using the `StringSpec` style. 
 
 ```kotlin
-    @Test
-    fun `Should enable Ok button once terms have been read`() {
-        val form = MyForm()
-        form.getChild<JButton>("Ok").shouldBeDisabled()
-        form.clickChild<JCheckBox>("I have read the terms and conditions")
-        form.getChild<JButton>("Ok").shouldBeEnabled()
-    }
+@Test
+fun `Should enable Ok button once terms have been read`() {
+    val form = MyForm()
+    form.getChild<JButton>("Ok").shouldBeDisabled()
+    form.clickChild<JCheckBox>("I have read the terms and conditions")
+    form.getChild<JButton>("Ok").shouldBeEnabled()
+}
 ```
 
 Easily interact with parts of a layout
 --------------------------------------
 
-Use in-built finders to interact with child components without having to expose them directly. In-built support for narrowing by `class`, `text` and `toolTipText`, as well as the ability to specify your own lambda for more complex cases:
+Use in-built finders to interact with child components without having to expose them directly. Out-the-box support for narrowing by `class`, `text` and `toolTipText`, plus the ability to specify your own lambda for more complex cases:
 
 ```kotlin
 val myContainer = MyContainer()
@@ -52,19 +52,19 @@ Snapshot Testing :camera_flash:
 swing-test provides a simple one-line approach for verifying that components match a generated `png` snapshot file. This is particularly useful for testing components with custom painting logic, which can otherwise be hard to verify:
 
 ```kotlin
-    @Test
-    fun `Should match snapshot - locked`()
-    {
-        val achievement = AchievementMedal(AchievementStatus.LOCKED)
-        achievement.shouldMatchImage("locked")
-    }
+@Test
+fun `Should match snapshot - locked`()
+{
+    val achievement = AchievementMedal(AchievementStatus.LOCKED)
+    achievement.shouldMatchImage("locked")
+}
 
-    @Test
-    fun `Should match snapshot - red`()
-    {
-        val achievement = AchievementMedal(AchievementStatus.RED)
-        medal.shouldMatchImage("red")
-    }
+@Test
+fun `Should match snapshot - red`()
+{
+    val achievement = AchievementMedal(AchievementStatus.RED)
+    medal.shouldMatchImage("red")
+}
 ```
 
 Snapshot images are automatically written to `src/test/resources/__snapshots__/your/package/structure/test-class/imageName.png`, for example:
@@ -84,7 +84,7 @@ Although swing-test is developed with Kotlin in mind, it fully supports raw Java
 Component myComponent = new CustomComponent();
 SwingSnapshotsKt.shouldMatchImage(myComponent, "Default");
 
-List<JButton> buttons = ComponentFindersKt.findAll(panel, JButton.class);
+List<JButton> buttons = ComponentFindersKt.findAll(myComponent, JButton.class);
 
 ComponentInteractionsKt.doHover(myComponent);
 ```
