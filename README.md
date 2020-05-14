@@ -25,7 +25,7 @@ Easily interact with parts of a layout
 
 Use in-built finders to interact with child components without having to expose them directly. In-built support for narrowing by `class`, `text` and `toolTipText`, as well as the ability to specify your own lambda for more complex cases:
 
-```
+```kotlin
 val myContainer = MyContainer()
 myContainer.findChild<JButton>(text = "Cancel").shouldBeNull()
 myContainer.getChild<JLabel>(toolTipText = "Avatar").shouldBeVisible()
@@ -36,7 +36,7 @@ myContainer.clickChild<JRadioButton> { it.text.contains("foo") }
 
 Simulate common interactions once you have a reference to the component you're after:
 
-```
+```kotlin
 val label = myContainer.getChild<JLabel>()
 label.doHover() //fires mouseEntered on listeners
 label.doHoverAway() //fires mouseExited
@@ -80,7 +80,7 @@ Fully interoperable with Java
 
 Although swing-test is developed with Kotlin in mind, it fully supports raw Java projects too:
 
-```
+```java
 Component myComponent = new CustomComponent();
 SwingSnapshotsKt.shouldMatchImage(myComponent, "Default");
 
