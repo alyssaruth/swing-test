@@ -1,7 +1,13 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.matchers.collections.shouldContainExactly
+import io.kotlintest.matchers.types.shouldBeNull
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldThrow
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Test
+import java.awt.event.ActionListener
 import javax.swing.*
 
 class ComponentFindersTest {
@@ -49,7 +55,7 @@ class ComponentFindersTest {
         panel.add(buttonB)
 
         val e = shouldThrow<MultipleComponentsException> {
-            panel.find<JButton>()
+            panel.findChild<JButton>()
         }
 
         e.message shouldBe "Found 2 JButtons, expected 1 or 0. Text [null], ToolTipText [null]"
@@ -68,7 +74,7 @@ class ComponentFindersTest {
         panel.add(buttonB)
 
         val e = shouldThrow<MultipleComponentsException> {
-            panel.find<JButton>(text = "Button", toolTipText = "Click me")
+            panel.findChild<JButton>(text = "Button", toolTipText = "Click me")
         }
 
         e.message shouldBe "Found 2 JButtons, expected 1 or 0. Text [Button], ToolTipText [Click me]"
@@ -79,25 +85,10 @@ class ComponentFindersTest {
         val panel = JPanel()
 
         val e = shouldThrow<NoSuchMethodException> {
-            panel.find<JPanel>(text = "Foo")
+            panel.findChild<JPanel>(text = "Foo")
         }
 
         e.message shouldBe "javax.swing.JPanel.getText()"
-    }
-
-    @Suppress("unused")
-    class BogusComponent(val text: Int) : JComponent()
-
-    @Test
-    fun `Should throw a NoSuchMethodException if the text field is not a String`() {
-        val panel = JPanel()
-        panel.add(BogusComponent(5))
-
-        val e = shouldThrow<NoSuchMethodException> {
-            panel.find<BogusComponent>(text = "Foo")
-        }
-
-        e.message shouldBe "class ComponentFindersTest\$BogusComponent.getText exists, but has non-String return type: int"
     }
 
     @Test
@@ -108,9 +99,9 @@ class ComponentFindersTest {
         panel.add(buttonA)
         panel.add(buttonB)
 
-        panel.find<JButton>(text = "Foo") shouldBe buttonA
-        panel.find<JButton>(text = "Bar") shouldBe buttonB
-        panel.find<JButton>(text = "Baz") shouldBe null
+        panel.findChild<JButton>(text = "Foo") shouldBe buttonA
+        panel.findChild<JButton>(text = "Bar") shouldBe buttonB
+        panel.findChild<JButton>(text = "Baz") shouldBe null
     }
 
     @Test
@@ -124,9 +115,9 @@ class ComponentFindersTest {
         labelA.toolTipText = "Label 1"
         labelB.toolTipText = "Label 2"
 
-        panel.find<JLabel>(toolTipText = "Label 1") shouldBe labelA
-        panel.find<JLabel>(toolTipText = "Label 2") shouldBe labelB
-        panel.find<JLabel>(toolTipText = "zz") shouldBe null
+        panel.findChild<JLabel>(toolTipText = "Label 1") shouldBe labelA
+        panel.findChild<JLabel>(toolTipText = "Label 2") shouldBe labelB
+        panel.findChild<JLabel>(toolTipText = "zz") shouldBe null
     }
 
     @Test
@@ -140,8 +131,8 @@ class ComponentFindersTest {
         buttonA.isEnabled = true
         buttonB.isEnabled = false
 
-        panel.find<JButton> { it.isEnabled } shouldBe buttonA
-        panel.find<JButton> { !it.isEnabled } shouldBe buttonB
+        panel.findChild<JButton> { it.isEnabled } shouldBe buttonA
+        panel.findChild<JButton> { !it.isEnabled } shouldBe buttonB
     }
 
     @Test
@@ -171,6 +162,35 @@ class ComponentFindersTest {
         panel.add(disabled)
 
         @Suppress("unused")
-        panel.find<JButton>(text = "Button Text", toolTipText = "Yes") { it.isEnabled } shouldBe expected
+        panel.findChild<JButton>(text = "Button Text", toolTipText = "Yes") { it.isEnabled } shouldBe expected
+    }
+
+    @Test
+    fun `Should handle an absent child component correctly`() {
+        val panel = JPanel()
+        panel.findChild<JButton>().shouldBeNull()
+
+        shouldThrow<NoSuchComponentException> {
+            panel.getChild<JButton>()
+        }
+    }
+
+    @Test
+    fun `Should click a child button and trigger its ActionListeners`() {
+        val panel = JPanel()
+        val buttonA = JButton("A")
+        val buttonB = JButton("B")
+        val listenerA = mockk<ActionListener>(relaxed = true)
+        val listenerB = mockk<ActionListener>(relaxed = true)
+
+        buttonA.addActionListener(listenerA)
+        buttonB.addActionListener(listenerB)
+        panel.add(buttonA)
+        panel.add(buttonB)
+
+        panel.clickChild<JButton>("A")
+
+        verify { listenerA.actionPerformed(any()) }
+        verifyNotCalled { listenerB.actionPerformed(any()) }
     }
 }

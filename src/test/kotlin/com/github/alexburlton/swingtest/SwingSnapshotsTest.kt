@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.matchers.file.shouldExist
 import io.kotlintest.matchers.file.shouldNotExist
@@ -19,7 +21,8 @@ import javax.swing.JComponent
 import javax.swing.JLabel
 
 class SwingSnapshotsTest {
-    private val resourceLocation = "src/test/resources/__snapshots__/SwingSnapshotsTest"
+    private val resourceLocation =
+        "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsTest"
     private val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 
     @BeforeEach
@@ -123,6 +126,35 @@ class SwingSnapshotsTest {
 
         File("$resourceLocation/Image.png").shouldExist()
         File("$resourceLocation/Image.failed.png").shouldNotExist()
+    }
+
+    @Test
+    fun `Should write a snapshot of the correct size`() {
+        val labelA = JLabel("A")
+        labelA.size = Dimension(500, 15)
+
+        val labelB = JLabel("B")
+        labelB.preferredSize = Dimension(400, 25)
+
+        val labelC = JLabel("C")
+        labelC.preferredSize = Dimension(0, 0)
+
+        labelA.createImageFile("A")
+        labelB.createImageFile("B")
+        labelC.createImageFile("C")
+
+        val fileA = File("$resourceLocation/A.png")
+        val fileB = File("$resourceLocation/B.png")
+        val fileC = File("$resourceLocation/C.png")
+
+        ImageIO.read(fileA).width shouldBe 500
+        ImageIO.read(fileA).height shouldBe 15
+
+        ImageIO.read(fileB).width shouldBe 400
+        ImageIO.read(fileB).height shouldBe 25
+
+        ImageIO.read(fileC).width shouldBe 200
+        ImageIO.read(fileC).height shouldBe 200
     }
 
     @Test

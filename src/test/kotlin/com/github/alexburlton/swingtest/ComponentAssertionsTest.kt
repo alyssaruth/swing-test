@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.shouldNotThrowAny
 import io.kotlintest.shouldThrow
 import org.junit.jupiter.api.Test

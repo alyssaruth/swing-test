@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest
+
 import io.kotlintest.fail
 import org.junit.jupiter.api.Assumptions
 import java.awt.Point
@@ -11,10 +13,25 @@ const val ENV_UPDATE_SNAPSHOT = "updateSnapshots"
 const val ENV_SCREENSHOT_OS = "screenshotOs"
 
 fun JComponent.toBufferedImage(): BufferedImage {
+    val width = getWidthForSnapshot()
+    val height = getHeightForSnapshot()
+    
     val img = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
     val g2 = img.createGraphics()
     paint(g2)
     return img
+}
+
+private fun JComponent.getWidthForSnapshot(): Int = when {
+    width > 0 -> width
+    preferredSize.width > 0 -> preferredSize.width
+    else -> 200
+}
+
+private fun JComponent.getHeightForSnapshot(): Int = when {
+    height > 0 -> height
+    preferredSize.height > 0 -> preferredSize.height
+    else -> 200
 }
 
 fun JComponent.shouldMatchImage(imageName: String) {

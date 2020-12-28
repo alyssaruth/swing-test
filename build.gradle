@@ -1,10 +1,13 @@
 plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.3.50'
+    id "maven-publish"
+    id 'org.jetbrains.dokka' version '0.10.1'
+    id "com.jfrog.bintray" version "1.8.4"
 }
 
 group 'com.github.alexburlton'
-version '1.0-SNAPSHOT'
+version '0.3.0'
 
 sourceCompatibility = 1.8
 
@@ -31,6 +34,11 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/dokka"
+}
+
 test {
     useJUnitPlatform()
 
@@ -38,5 +46,84 @@ test {
         events "failed"
         exceptionFormat "short"
         info.events = ["failed", "skipped"]
+    }
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        SwingTestPublication(MavenPublication) {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from components.java
+
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+
+            pom {
+                name = 'swing-test'
+                description = 'Kotlin swing testing library'
+                url = "https://github.com/alexburlton/swing-test"
+
+                developers {
+                    developer {
+                        id = 'alexburlton'
+                        name = 'Alex Burlton'
+                    }
+                }
+
+                scm {
+                    url = "https://github.com/alexburlton/swing-test"
+                }
+
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = "https://opensource.org/licenses/mit-license.php"
+                    }
+                }
+            }
+        }
+    }
+}
+
+bintray {
+    user = project.findProperty("bintrayUser").toString()
+    key = project.findProperty("bintrayKey").toString()
+
+    publications = ['SwingTestPublication']
+    publish = true
+
+    pkg {
+        repo = "swing-test"
+        name = project.name
+        userOrg = "alexburlton"
+        licenses = ['MIT']
+        vcsUrl = "https://github.com/alexburlton/swing-test"
+        desc = 'Kotlin swing testing library'
+        labels = ["kotlin", "swing", "testing", "java"]
+        websiteUrl = "https://github.com/alexburlton/swing-test"
+        issueTrackerUrl = "https://github.com/alexburlton/swing-test/issues"
+        githubRepo = "alexburlton/swing-test"
+        githubReleaseNotesFile = "README.md"
+
+        version {
+            name = project.version.toString()
+            desc = 'swing-test'
+            released = new Date()
+            vcsTag = project.version.toString()
+        }
     }
 }

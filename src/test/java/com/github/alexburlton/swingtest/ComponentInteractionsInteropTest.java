@@ -1,3 +1,5 @@
+package com.github.alexburlton.swingtest;
+
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
