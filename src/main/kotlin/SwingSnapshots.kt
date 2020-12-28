@@ -1,5 +1,5 @@
 import io.kotlintest.fail
-import org.junit.Assume
+import org.junit.jupiter.api.Assumptions
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.io.File
@@ -20,7 +20,7 @@ fun JComponent.toBufferedImage(): BufferedImage {
 fun JComponent.shouldMatchImage(imageName: String) {
     verifyOs()
 
-    val overwrite = System.getenv(ENV_UPDATE_SNAPSHOT) == "true"
+    val overwrite = System.getProperty(ENV_UPDATE_SNAPSHOT) == "true"
     val img = toBufferedImage()
 
     val callingSite = Throwable().stackTrace[1].className
@@ -47,13 +47,12 @@ fun JComponent.shouldMatchImage(imageName: String) {
 }
 
 private fun verifyOs() {
-    val osForScreenshots = (System.getenv(ENV_SCREENSHOT_OS) ?: "").toLowerCase(Locale.ENGLISH)
+    val osForScreenshots = (System.getProperty(ENV_SCREENSHOT_OS) ?: "").toLowerCase(Locale.ENGLISH)
 
     val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
     if (osForScreenshots.isNotEmpty()) {
-        Assume.assumeTrue(
-            "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)",
-            os.contains(osForScreenshots)
+        Assumptions.assumeTrue(os.contains(osForScreenshots),
+            "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)"
         )
     }
 }

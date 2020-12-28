@@ -1,5 +1,5 @@
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 import java.util.List;
@@ -14,7 +14,7 @@ public class ComponentFindersInteropTest {
         panel.add(buttonTwo);
 
         List<JButton> buttons = ComponentFindersKt.findAll(panel, JButton.class);
-        Assert.assertEquals(buttons.get(0), buttonOne);
-        Assert.assertEquals(buttons.get(1), buttonTwo);
+        Assertions.assertEquals(buttons.get(0), buttonOne);
+        Assertions.assertEquals(buttons.get(1), buttonTwo);
     }
 }
