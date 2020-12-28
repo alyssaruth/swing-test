@@ -71,9 +71,9 @@ Snapshot images are automatically written to `src/test/resources/__snapshots__/y
 
 ![image](https://user-images.githubusercontent.com/5732536/81931594-43270680-95e2-11ea-8a3f-aef01b91ab31.png)
 
- - Running with the environment variable `updateSnapshots=true` allows the image files to be created for the first time, or updated locally in the event of a deliberate change.
+ - Running with the system property `updateSnapshots=true` allows the image files to be created for the first time, or updated locally in the event of a deliberate change.
  - When a snapshot comparison fails, the failed image file is written out with the same name and a `failed.png` extension, to allow easy manual inspection.
- - Due to pixel differences caused by running on different operating systems, you may optionally specify a `screenshotOs` environment variable, e.g. `screenshotOs=linux`. This will cause any screenshot tests to be skipped when run on a different operating system.
+ - Due to pixel differences caused by running on different operating systems, you may optionally specify a `screenshotOs` system property, e.g. `screenshotOs=linux`. This will cause any screenshot tests to be skipped when run on a different operating system.
 
 Fully interoperable with Java
 -----------------------------

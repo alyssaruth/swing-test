@@ -1,20 +1,20 @@
 package com.github.alexburlton.swingtest
 
 import io.kotlintest.shouldBe
-import javax.swing.JComponent
+import java.awt.Component
 
-fun JComponent.shouldBeEnabled() {
+fun Component.shouldBeEnabled() {
     isEnabled shouldBe true
 }
 
-fun JComponent.shouldBeDisabled() {
+fun Component.shouldBeDisabled() {
     isEnabled shouldBe false
 }
 
-fun JComponent.shouldBeVisible() {
+fun Component.shouldBeVisible() {
     isVisible shouldBe true
 }
 
-fun JComponent.shouldNotBeVisible() {
+fun Component.shouldNotBeVisible() {
     isVisible shouldBe false
 }

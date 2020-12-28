@@ -1,6 +1,6 @@
 package com.github.alexburlton.swingtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
 import java.awt.event.MouseListener;

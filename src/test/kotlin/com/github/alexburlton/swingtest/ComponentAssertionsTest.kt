@@ -2,7 +2,7 @@ package com.github.alexburlton.swingtest
 
 import io.kotlintest.shouldNotThrowAny
 import io.kotlintest.shouldThrow
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import javax.swing.JLabel
 
 class ComponentAssertionsTest {

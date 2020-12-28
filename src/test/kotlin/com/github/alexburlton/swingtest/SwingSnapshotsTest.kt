@@ -6,8 +6,10 @@ import io.kotlintest.matchers.file.shouldNotExist
 import io.kotlintest.shouldBe
 import io.kotlintest.shouldNotThrowAny
 import io.kotlintest.shouldThrow
-import org.junit.*
-import org.junit.contrib.java.lang.system.EnvironmentVariables
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.opentest4j.TestAbortedException
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Point
@@ -23,17 +25,14 @@ class SwingSnapshotsTest {
         "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsTest"
     private val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 
-    @Rule
-    @JvmField
-    val environmentVariables = EnvironmentVariables()
-
-    @Before
+    @BeforeEach
     fun before() {
-        environmentVariables.clear(ENV_SCREENSHOT_OS, ENV_UPDATE_SNAPSHOT)
+        System.clearProperty(ENV_SCREENSHOT_OS)
+        System.clearProperty(ENV_UPDATE_SNAPSHOT)
         File(resourceLocation).deleteRecursively()
     }
 
-    @After
+    @AfterEach
     fun after() {
         File(resourceLocation).deleteRecursively()
     }
@@ -46,13 +45,13 @@ class SwingSnapshotsTest {
             label.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Snapshot image not found: $resourceLocation/Image.png. Run with env var updateSnapshots=true to write for the first time."
+        exception.message shouldBe "Snapshot image not found: $resourceLocation/Image.png. Run with system property -DupdateSnapshots=true to write for the first time."
         File("$resourceLocation/Image.png").shouldNotExist()
     }
 
     @Test
     fun `Should pass and write new snapshot if in updateSnapshots mode`() {
-        environmentVariables.set(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
 
         val label = makeComponent()
 
@@ -65,23 +64,23 @@ class SwingSnapshotsTest {
 
     @Test
     fun `Should skip the test if on the wrong OS`() {
-        environmentVariables.set(ENV_SCREENSHOT_OS, "invalid")
-        environmentVariables.set(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(ENV_SCREENSHOT_OS, "invalid")
+        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
 
         val label = makeComponent()
 
-        val exception = shouldThrow<AssumptionViolatedException> {
+        val exception = shouldThrow<TestAbortedException> {
             label.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Wrong OS for screenshot tests (wanted invalid, found $os)"
+        exception.message shouldBe "Assumption failed: Wrong OS for screenshot tests (wanted invalid, found $os)"
         File("$resourceLocation/Image.png").shouldNotExist()
     }
 
     @Test
     fun `Should not skip the test if OS matches`() {
-        environmentVariables.set(ENV_SCREENSHOT_OS, os)
-        environmentVariables.set(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(ENV_SCREENSHOT_OS, os)
+        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
 
         val label = makeComponent()
 
@@ -103,7 +102,7 @@ class SwingSnapshotsTest {
             otherLabel.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png. Run with env var updateSnapshots=true to overwrite."
+        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png. Run with system property -DupdateSnapshots=true to overwrite."
 
         val originalFile = File("$resourceLocation/Image.png")
         val failedFile = File("$resourceLocation/Image.failed.png")
@@ -183,9 +182,9 @@ class SwingSnapshotsTest {
     }
 
     private fun JComponent.createImageFile(filename: String) {
-        environmentVariables.set(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
         shouldMatchImage(filename)
-        environmentVariables.clear(ENV_UPDATE_SNAPSHOT)
+        System.clearProperty(ENV_UPDATE_SNAPSHOT)
     }
 
     private fun makeComponent(text: String = "Label A") = JLabel(text).also { it.size = Dimension(200, 40) }
