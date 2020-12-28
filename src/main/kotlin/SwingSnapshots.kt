@@ -28,7 +28,7 @@ fun JComponent.shouldMatchImage(imageName: String) {
 
     val file = File("$imgPath/$imageName.png")
     if (!file.exists() && !overwrite) {
-        fail("Snapshot image not found: $imgPath/$imageName.png. Run with env var updateSnapshots=true to write for the first time.")
+        fail("Snapshot image not found: $imgPath/$imageName.png. Run with system property -DupdateSnapshots=true to write for the first time.")
     }
 
     file.mkdirs()
@@ -41,7 +41,7 @@ fun JComponent.shouldMatchImage(imageName: String) {
         if (!match) {
             val failedFile = File("$imgPath/$imageName.failed.png")
             ImageIO.write(img, "png", failedFile)
-            fail("Snapshot image did not match: $imgPath/$imageName.png. Run with env var updateSnapshots=true to overwrite.")
+            fail("Snapshot image did not match: $imgPath/$imageName.png. Run with system property -DupdateSnapshots=true to overwrite.")
         }
     }
 }

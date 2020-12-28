@@ -42,7 +42,7 @@ class SwingSnapshotsTest {
             label.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Snapshot image not found: $resourceLocation/Image.png. Run with env var updateSnapshots=true to write for the first time."
+        exception.message shouldBe "Snapshot image not found: $resourceLocation/Image.png. Run with system property -DupdateSnapshots=true to write for the first time."
         File("$resourceLocation/Image.png").shouldNotExist()
     }
 
@@ -99,7 +99,7 @@ class SwingSnapshotsTest {
             otherLabel.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png. Run with env var updateSnapshots=true to overwrite."
+        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png. Run with system property -DupdateSnapshots=true to overwrite."
 
         val originalFile = File("$resourceLocation/Image.png")
         val failedFile = File("$resourceLocation/Image.failed.png")
