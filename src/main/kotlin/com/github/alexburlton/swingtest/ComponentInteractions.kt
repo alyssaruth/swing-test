@@ -2,6 +2,7 @@ package com.github.alexburlton.swingtest
 
 import java.awt.Component
 import java.awt.event.FocusEvent
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.KeyStroke
 
@@ -56,4 +57,16 @@ fun JComponent.doLoseFocus() {
 
 fun JComponent.doGainFocus() {
     focusListeners.forEach { it.focusGained(FocusEvent(this, FocusEvent.FOCUS_GAINED)) }
+}
+
+fun JCheckBox.check() {
+    if (!isSelected) {
+        doClick()
+    }
+}
+
+fun JCheckBox.uncheck() {
+    if (isSelected) {
+        doClick()
+    }
 }

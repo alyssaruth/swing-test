@@ -1,5 +1,6 @@
 package com.github.alexburlton.swingtest
 
+import io.kotlintest.shouldBe
 import io.mockk.MockKMatcherScope
 import io.mockk.mockk
 import io.mockk.verify
@@ -116,6 +117,70 @@ class ComponentInteractionsTest {
 
         label.doLoseFocus()
         verify { focusListener.focusLost(focusEvent(label, FocusEvent.FOCUS_LOST)) }
+    }
+
+    @Test
+    fun `Should do nothing if checkbox is already unchecked`() {
+        val checkbox = JCheckBox()
+        val listener = mockk<ActionListener>(relaxed = true)
+        checkbox.addActionListener(listener)
+
+        checkbox.isSelected shouldBe false
+        checkbox.uncheck()
+        checkbox.isSelected shouldBe false
+
+        verifyNotCalled {
+            listener.actionPerformed(any())
+        }
+    }
+
+    @Test
+    fun `Should do nothing if checkbox is already checked`() {
+        val checkbox = JCheckBox()
+        checkbox.isSelected = true
+
+        val listener = mockk<ActionListener>(relaxed = true)
+        checkbox.addActionListener(listener)
+
+        checkbox.isSelected shouldBe true
+        checkbox.check()
+        checkbox.isSelected shouldBe true
+
+        verifyNotCalled {
+            listener.actionPerformed(any())
+        }
+    }
+
+    @Test
+    fun `Should check an unchecked checkbox`() {
+        val checkbox = JCheckBox()
+
+        val listener = mockk<ActionListener>(relaxed = true)
+        checkbox.addActionListener(listener)
+
+        checkbox.isSelected shouldBe false
+        checkbox.check()
+        checkbox.isSelected shouldBe true
+
+        verify {
+            listener.actionPerformed(any())
+        }
+    }
+
+    @Test
+    fun `Should uncheck a checked checkbox`() {
+        val checkbox = JCheckBox()
+        checkbox.isSelected = true
+
+        val listener = mockk<ActionListener>(relaxed = true)
+        checkbox.addActionListener(listener)
+
+        checkbox.uncheck()
+        checkbox.isSelected shouldBe false
+
+        verify {
+            listener.actionPerformed(any())
+        }
     }
 
     private fun MockKMatcherScope.eventWithClickCount(count: Int) = match<MouseEvent> {
