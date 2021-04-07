@@ -6,6 +6,9 @@ plugins {
     id "com.jfrog.bintray" version "1.8.4"
 }
 
+apply plugin: 'maven'
+apply plugin: 'signing'
+
 group 'com.github.alexburlton'
 version '1.0.0'
 
@@ -47,40 +50,48 @@ test {
     }
 }
 
+task javadocJar(type: Jar) {
+    archiveClassifier.set("javadoc")
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
 java {
     withJavadocJar()
     withSourcesJar()
 }
 
-publishing {
-    publications {
-        SwingTestPublication(MavenPublication) {
-            groupId = project.group.toString()
-            artifactId = project.name
-            version = project.version.toString()
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-            from components.java
-
-            versionMapping {
-                usage('java-api') {
-                    fromResolutionOf('runtimeClasspath')
-                }
-                usage('java-runtime') {
-                    fromResolutionResult()
-                }
+            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
             }
 
-            pom {
-                name = 'swing-test'
-                description = 'Kotlin swing testing library'
-                url = "https://github.com/alexburlton/swing-test"
+            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
 
-                developers {
-                    developer {
-                        id = 'alexburlton'
-                        name = 'Alex Burlton'
-                    }
-                }
+            pom.project {
+                name 'swing-test'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Kotlin swing testing library'
+                url 'https://github.com/alexburlton/swing-test'
 
                 scm {
                     url = "https://github.com/alexburlton/swing-test"
@@ -92,36 +103,14 @@ publishing {
                         url = "https://opensource.org/licenses/mit-license.php"
                     }
                 }
+
+                developers {
+                    developer {
+                        id = 'alexburlton'
+                        name = 'Alex Burlton'
+                    }
+                }
             }
-        }
-    }
-}
-
-bintray {
-    user = project.findProperty("bintrayUser").toString()
-    key = project.findProperty("bintrayKey").toString()
-
-    publications = ['SwingTestPublication']
-    publish = true
-
-    pkg {
-        repo = "swing-test"
-        name = project.name
-        userOrg = "alexburlton"
-        licenses = ['MIT']
-        vcsUrl = "https://github.com/alexburlton/swing-test"
-        desc = 'Kotlin swing testing library'
-        labels = ["kotlin", "swing", "testing", "java"]
-        websiteUrl = "https://github.com/alexburlton/swing-test"
-        issueTrackerUrl = "https://github.com/alexburlton/swing-test/issues"
-        githubRepo = "alexburlton/swing-test"
-        githubReleaseNotesFile = "README.md"
-
-        version {
-            name = project.version.toString()
-            desc = 'swing-test'
-            released = new Date()
-            vcsTag = project.version.toString()
         }
     }
 }
