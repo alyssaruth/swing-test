@@ -86,11 +86,11 @@ Fully interoperable with Java
 
 Although swing-test is developed with Kotlin in mind, it fully supports raw Java projects too:
 
-```java
-Component myComponent=new CustomComponent();
-        SwingSnapshotsKt.shouldMatchImage(myComponent,"Default");
+```
+Component myComponent = new CustomComponent();
+SwingSnapshotsKt.shouldMatchImage(myComponent,"Default");
 
-        List<JButton> buttons=ComponentFindersKt.findAll(myComponent,JButton.class);
+List<JButton> buttons=ComponentFindersKt.findAll(myComponent,JButton.class);
 
-        ComponentInteractionsKt.doHover(myComponent);
+ComponentInteractionsKt.doHover(myComponent);
 ```
