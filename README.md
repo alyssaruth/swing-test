@@ -1,6 +1,6 @@
 # swing-test
 
-[![Build Status](https://github.com/alexburlton/swing-test/workflows/build/badge.svg)](https://github.com/alexburlton/swing-test/actions)
+[![Build Status](https://github.com/alyssaburlton/swing-test/workflows/build/badge.svg)](https://github.com/alyssaburlton/swing-test/actions)
 [<img src="https://img.shields.io/maven-central/v/com.github.alexburlton/swing-test.svg?label=latest%20release"/>](http://search.maven.org/#search|ga|1|g:com.github.alexburlton)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 

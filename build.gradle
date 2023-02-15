@@ -8,7 +8,7 @@ plugins {
 apply plugin: 'maven'
 apply plugin: 'signing'
 
-group 'com.github.alexburlton'
+group 'com.github.alyssaburlton'
 version '1.0.0'
 
 repositories {
@@ -96,10 +96,10 @@ uploadArchives {
                 name 'swing-test'
                 packaging 'jar'
                 description 'Kotlin swing testing library'
-                url 'https://github.com/alexburlton/swing-test'
+                url 'https://github.com/alyssaburlton/swing-test'
 
                 scm {
-                    url = "https://github.com/alexburlton/swing-test"
+                    url = "https://github.com/alyssaburlton/swing-test"
                 }
 
                 licenses {
@@ -111,8 +111,8 @@ uploadArchives {
 
                 developers {
                     developer {
-                        id = 'alexburlton'
-                        name = 'Alex Burlton'
+                        id = 'alyssaburlton'
+                        name = 'Alyssa Burlton'
                     }
                 }
             }

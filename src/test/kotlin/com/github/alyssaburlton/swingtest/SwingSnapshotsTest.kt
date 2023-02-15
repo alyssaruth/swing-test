@@ -23,7 +23,7 @@ import javax.swing.JLabel
 
 class SwingSnapshotsTest {
     private val resourceLocation =
-        "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsTest"
+        "src/test/resources/__snapshots__/com.github.alyssaburlton.swingtest.SwingSnapshotsTest"
     private val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
 
     @BeforeEach

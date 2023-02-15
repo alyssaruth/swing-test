@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.io.File;
 
 public class SwingSnapshotsInteropTest {
-    private final String resourceLocation = "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsInteropTest";
+    private final String resourceLocation = "src/test/resources/__snapshots__/com.github.alyssaburlton.swingtest.SwingSnapshotsInteropTest";
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @AfterEach
