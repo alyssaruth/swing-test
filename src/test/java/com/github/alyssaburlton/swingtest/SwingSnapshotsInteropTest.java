@@ -1,4 +1,4 @@
-package com.github.alexburlton.swingtest;
+package com.github.alyssaburlton.swingtest;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.io.File;
 
 public class SwingSnapshotsInteropTest {
-    private String resourceLocation = "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsInteropTest";
+    private final String resourceLocation = "src/test/resources/__snapshots__/com.github.alexburlton.swingtest.SwingSnapshotsInteropTest";
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @AfterEach

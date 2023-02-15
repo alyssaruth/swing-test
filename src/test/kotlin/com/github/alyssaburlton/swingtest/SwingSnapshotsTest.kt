@@ -1,4 +1,4 @@
-package com.github.alexburlton.swingtest
+package com.github.alyssaburlton.swingtest
 
 import io.kotlintest.matchers.collections.shouldContainExactly
 import io.kotlintest.matchers.file.shouldExist
@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
+import javax.swing.ImageIcon
 import javax.swing.JComponent
 import javax.swing.JLabel
 
@@ -179,6 +180,22 @@ class SwingSnapshotsTest {
 
         img.setRGB(0, 0, Color.GREEN.rgb)
         img.isEqual(img2) shouldBe true
+    }
+
+    @Test
+    fun `Should match icons correctly`() {
+        val icon = ImageIcon(javaClass.getResource("/images/Hornet.png"))
+
+        val otherMatchingIcon = ImageIcon(javaClass.getResource("/images/Hornet.png"))
+        val nonMatchingIcon = ImageIcon(javaClass.getResource("/images/Knight.png"))
+
+        shouldNotThrowAny {
+            icon.shouldMatch(otherMatchingIcon)
+        }
+
+        shouldThrow<AssertionError> {
+            icon.shouldMatch(nonMatchingIcon)
+        }
     }
 
     private fun JComponent.createImageFile(filename: String) {

@@ -1,16 +1,33 @@
-package com.github.alexburlton.swingtest
+package com.github.alyssaburlton.swingtest
 
 import io.kotlintest.fail
+import io.kotlintest.shouldBe
 import org.junit.jupiter.api.Assumptions
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
+import javax.swing.Icon
 import javax.swing.JComponent
 
 const val ENV_UPDATE_SNAPSHOT = "updateSnapshots"
 const val ENV_SCREENSHOT_OS = "screenshotOs"
+private const val DEFAULT_WIDTH = 200
+private const val DEFAULT_HEIGHT = 200
+
+fun Icon.shouldMatch(other: Icon)
+{
+    toBufferedImage().isEqual(other.toBufferedImage()) shouldBe true
+}
+private fun Icon.toBufferedImage(): BufferedImage
+{
+    val bi = BufferedImage(iconWidth, iconHeight, BufferedImage.TYPE_INT_RGB)
+    val g = bi.createGraphics()
+    paintIcon(null, g, 0, 0)
+    g.dispose()
+    return bi
+}
 
 fun JComponent.toBufferedImage(): BufferedImage {
     val width = getWidthForSnapshot()
@@ -25,13 +42,13 @@ fun JComponent.toBufferedImage(): BufferedImage {
 private fun JComponent.getWidthForSnapshot(): Int = when {
     width > 0 -> width
     preferredSize.width > 0 -> preferredSize.width
-    else -> 200
+    else -> DEFAULT_WIDTH
 }
 
 private fun JComponent.getHeightForSnapshot(): Int = when {
     height > 0 -> height
     preferredSize.height > 0 -> preferredSize.height
-    else -> 200
+    else -> DEFAULT_HEIGHT
 }
 
 fun JComponent.shouldMatchImage(imageName: String) {
