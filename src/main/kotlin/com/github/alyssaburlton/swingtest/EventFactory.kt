@@ -1,4 +1,4 @@
-package com.github.alexburlton.swingtest
+package com.github.alyssaburlton.swingtest
 
 import java.awt.Component
 import java.awt.event.ActionEvent

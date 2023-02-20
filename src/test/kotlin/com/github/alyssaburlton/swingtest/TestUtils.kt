@@ -1,4 +1,4 @@
-package com.github.alexburlton.swingtest
+package com.github.alyssaburlton.swingtest
 
 import io.mockk.verify
 

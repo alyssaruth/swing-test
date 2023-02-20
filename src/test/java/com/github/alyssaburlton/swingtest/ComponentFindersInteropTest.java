@@ -1,4 +1,4 @@
-package com.github.alexburlton.swingtest;
+package com.github.alyssaburlton.swingtest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
