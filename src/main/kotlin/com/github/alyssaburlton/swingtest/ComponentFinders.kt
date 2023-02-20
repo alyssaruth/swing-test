@@ -46,18 +46,18 @@ class NoSuchComponentException(override val message: String) : Exception(message
  * @return the found component, or null if no match is found.
  *
  * @param T: The class of component to look for
+ * @param name: If non-null, filter to components with this name
  * @param text: If non-null, filter to components with a text field containing the specified String
- * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
  * @param filterFn: Lambda argument to allow custom additional filters to be imposed
  *
  * @throws MultipleComponentsException if more than one component is found
- * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
+ * @throws NoSuchMethodException if text is specified for a component type that does not have it
  */
 inline fun <reified T : Component> Container.findChild(
+    name: String? = null,
     text: String? = null,
-    toolTipText: String? = null,
     noinline filterFn: ((T) -> Boolean)? = null
-): T? = findChild(T::class.java, text, toolTipText, filterFn)
+): T? = findChild(T::class.java, name, text, filterFn)
 
 /**
  * Find a single child component, recursing through child containers.
@@ -66,41 +66,41 @@ inline fun <reified T : Component> Container.findChild(
  * @return the found component, or null if no match is found.
  *
  * @param clazz: The class of component to look for
+ * @param name: If non-null, filter to components with this name
  * @param text: If non-null, filter to components with a text field containing the specified String
- * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
  * @param filterFn: Lambda argument to allow custom additional filters to be imposed
  *
  * @throws MultipleComponentsException if more than one component is found
- * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
+ * @throws NoSuchMethodException if text is specified for a component type that does not have them
  */
 @JvmOverloads
 fun <T : Component> Container.findChild(
-    clazz: Class<T>, text: String? = null,
-    toolTipText: String? = null,
+    clazz: Class<T>,
+    name: String? = null,
+    text: String? = null,
     filterFn: ((T) -> Boolean)? = null
 ): T? {
     val allComponents = findAll(clazz)
 
-    var filtered = filterByField(clazz, allComponents, "Text", text)
-    filtered = filterByField(clazz, filtered, "ToolTipText", toolTipText)
+    var filtered = filterByText(clazz, allComponents, text)
+    filtered = filtered.filter { name == null || it.name == name }
     filterFn?.let { filtered = filtered.filter { filterFn(it) } }
 
     if (filtered.size > 1) {
-        throw MultipleComponentsException("Found ${filtered.size} ${clazz.simpleName}s, expected 1 or 0. Text [$text], ToolTipText [$toolTipText]")
+        throw MultipleComponentsException("Found ${filtered.size} ${clazz.simpleName}s, expected 1 or 0. name [$name], Text [$text]")
     }
 
     return filtered.firstOrNull()
 }
 
-private fun <T : Component> filterByField(
+private fun <T : Component> filterByText(
     clazz: Class<T>,
     components: List<T>,
-    fieldName: String,
     match: String?
 ): List<T> {
     match ?: return components
 
-    val getter = clazz.getMethod("get$fieldName")
+    val getter = clazz.getMethod("getText")
     return components.filter {
         val result = getter.invoke(it)
         "$result" == match
@@ -113,19 +113,19 @@ private fun <T : Component> filterByField(
  * @return the found component
  *
  * @param T: The class of component to look for
+ * @param name: If non-null, filter to components with a name set to the specified String
  * @param text: If non-null, filter to components with a text field containing the specified String
- * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
  * @param filterFn: Lambda argument to allow custom additional filters to be imposed
  *
  * @throws NoSuchComponentException if no matching component is found
  * @throws MultipleComponentsException if more than one component is found
- * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
+ * @throws NoSuchMethodException if text is specified for a component type that does not have them
  */
 inline fun <reified T : Component> Container.getChild(
+    name: String? = null,
     text: String? = null,
-    toolTipText: String? = null,
     noinline filterFn: ((T) -> Boolean)? = null
-): T = getChild(T::class.java, text, toolTipText, filterFn)
+): T = getChild(T::class.java, name, text, filterFn)
 
 /**
  * Get a single child component, recursing through child containers.
@@ -134,8 +134,8 @@ inline fun <reified T : Component> Container.getChild(
  * @return the found component
  *
  * @param clazz: The class of component to look for
+ * @param name: If non-null, filter to components with a name set to the specified String
  * @param text: If non-null, filter to components with a text field containing the specified String
- * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
  * @param filterFn: Lambda argument to allow custom additional filters to be imposed
  *
  * @throws NoSuchComponentException if no matching component is found
@@ -145,18 +145,18 @@ inline fun <reified T : Component> Container.getChild(
 @JvmOverloads
 fun <T : Component> Container.getChild(
     clazz: Class<T>,
+    name: String? = null,
     text: String? = null,
-    toolTipText: String? = null,
     filterFn: ((T) -> Boolean)? = null
-): T = findChild(clazz, text, toolTipText, filterFn)
-    ?: throw NoSuchComponentException("Found 0 ${clazz.simpleName}s. Text [$text], ToolTipText [$toolTipText]")
+): T = findChild(clazz, name, text, filterFn)
+    ?: throw NoSuchComponentException("Found 0 ${clazz.simpleName}s. Text [$text], name [$name]")
 
 /**
  * Simulate a click on a child component, recursing through child containers.
  *
  * @param T: The class of component to look for
+ * @param name: If non-null, filter to components with a name set to the specified String
  * @param text: If non-null, filter to components with a text field containing the specified String
- * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
  * @param filterFn: Lambda argument to allow custom additional filters to be imposed
  *
  * @throws NoSuchComponentException if no matching component is found
@@ -164,11 +164,11 @@ fun <T : Component> Container.getChild(
  * @throws NoSuchMethodException if text or toolTipText are specified for a component type that does not have them
  */
 inline fun <reified T : AbstractButton> Container.clickChild(
+    name: String? = null,
     text: String? = null,
-    toolTipText: String? = null,
     noinline filterFn: ((T) -> Boolean)? = null
 ) {
-    clickChild(T::class.java, text, toolTipText, filterFn)
+    clickChild(T::class.java, name, text, filterFn)
 }
 
 /**
@@ -176,8 +176,8 @@ inline fun <reified T : AbstractButton> Container.clickChild(
  * Non reified version for calling from Java.
  *
  * @param clazz: The class of component to look for
+ * @param name: If non-null, filter to components with name set to the specified String
  * @param text: If non-null, filter to components with a text field containing the specified String
- * @param toolTipText: If non-null, filter to components with a toolTipText field containing the specified String
  * @param filterFn: Lambda argument to allow custom additional filters to be imposed
  *
  * @throws NoSuchComponentException if no matching component is found
@@ -187,9 +187,9 @@ inline fun <reified T : AbstractButton> Container.clickChild(
 @JvmOverloads
 fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
+    name: String? = null,
     text: String? = null,
-    toolTipText: String? = null,
     filterFn: ((T) -> Boolean)? = null
 ) {
-    getChild(clazz, text, toolTipText, filterFn).doClick()
+    getChild(clazz, name, text, filterFn).doClick()
 }
