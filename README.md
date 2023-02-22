@@ -15,9 +15,9 @@ Write simple assertions for Swing components, using the `StringSpec` style.
 @Test
 fun `Should enable Ok button once terms have been read`() {
     val form = MyForm()
-    form.getChild<JButton>("Ok").shouldBeDisabled()
+    form.getChild<JButton>(text = "Ok").shouldBeDisabled()
     form.clickChild<JCheckBox>("I have read the terms and conditions")
-    form.getChild<JButton>("Ok").shouldBeEnabled()
+    form.getChild<JButton>(text = "Ok").shouldBeEnabled()
 }
 ```
 
@@ -25,12 +25,12 @@ Easily interact with whole layouts
 ----------------------------------
 
 Use in-built finders to interact with child components without having to expose them directly. Out-the-box support for
-narrowing by `class`, `text` and `toolTipText`, plus the ability to specify your own lambda for more complex cases:
+narrowing by `class`, `name` (an unused property on Component that can be used as a testId) and `text`, plus the ability to specify your own lambda for more complex cases:
 
 ```kotlin
 val myContainer = MyContainer()
 myContainer.findChild<JButton>(text = "Cancel").shouldBeNull()
-myContainer.getChild<JLabel>(toolTipText = "Avatar").shouldBeVisible()
+myContainer.getChild<JLabel>(name = "AvatarLabel").shouldBeVisible()
 
 // Custom example
 myContainer.clickChild<JRadioButton> { it.text.contains("foo") }
