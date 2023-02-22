@@ -7,7 +7,7 @@ plugins {
     id 'org.jetbrains.dokka' version '0.10.1'
 }
 
-group 'com.github.alyssaburlton'
+group 'com.github.alexburlton'
 version '2.0.0'
 
 repositories {
@@ -65,20 +65,12 @@ java {
     withSourcesJar()
 }
 
-ext["signing.keyId"] = ''
-ext["signing.password"] = ''
-ext["signing.secretKeyRingFile"] = ''
-ext["ossrhUsername"] = ''
-ext["ossrhPassword"] = ''
-ext["sonatypeStagingProfileId"] = ''
-
 publishing {
     publications {
-        release(MavenPublication) {
-            groupId = 'com.github.alyssaburlton'
+        mavenJava(MavenPublication) {
+            groupId = 'com.github.alexburlton'
             artifactId = 'swing-test'
             version = '2.0.0'
-
             from components.java
 
             pom {
@@ -120,5 +112,5 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.release
+    sign publishing.publications.mavenJava
 }

@@ -1,7 +1,7 @@
 package com.github.alyssaburlton.swingtest
 
-import io.kotlintest.shouldNotThrowAny
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
 import org.junit.jupiter.api.Test
 import javax.swing.JLabel
 

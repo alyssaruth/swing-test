@@ -1,11 +1,11 @@
 package com.github.alyssaburlton.swingtest
 
-import io.kotlintest.matchers.collections.shouldContainExactly
-import io.kotlintest.matchers.file.shouldExist
-import io.kotlintest.matchers.file.shouldNotExist
-import io.kotlintest.shouldBe
-import io.kotlintest.shouldNotThrowAny
-import io.kotlintest.shouldThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.file.shouldExist
+import io.kotest.matchers.file.shouldNotExist
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -15,7 +15,6 @@ import java.awt.Dimension
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.io.File
-import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 import javax.swing.JComponent
@@ -24,7 +23,7 @@ import javax.swing.JLabel
 class SwingSnapshotsTest {
     private val resourceLocation =
         "src/test/resources/__snapshots__/com.github.alyssaburlton.swingtest.SwingSnapshotsTest"
-    private val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+    private val os = System.getProperty("os.name").lowercase()
 
     @BeforeEach
     fun before() {
