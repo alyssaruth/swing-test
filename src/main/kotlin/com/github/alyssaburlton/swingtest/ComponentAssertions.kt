@@ -1,6 +1,6 @@
 package com.github.alyssaburlton.swingtest
 
-import io.kotlintest.shouldBe
+import io.kotest.matchers.shouldBe
 import java.awt.Component
 
 fun Component.shouldBeEnabled() {

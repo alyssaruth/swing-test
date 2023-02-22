@@ -1,12 +1,11 @@
 package com.github.alyssaburlton.swingtest
 
-import io.kotlintest.fail
-import io.kotlintest.shouldBe
+import io.kotest.assertions.fail
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assumptions
 import java.awt.Point
 import java.awt.image.BufferedImage
 import java.io.File
-import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.Icon
 import javax.swing.JComponent
@@ -81,9 +80,9 @@ fun JComponent.shouldMatchImage(imageName: String) {
 }
 
 private fun verifyOs() {
-    val osForScreenshots = (System.getProperty(ENV_SCREENSHOT_OS) ?: "").toLowerCase(Locale.ENGLISH)
+    val osForScreenshots = (System.getProperty(ENV_SCREENSHOT_OS) ?: "").lowercase()
 
-    val os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH)
+    val os = System.getProperty("os.name").lowercase()
     if (osForScreenshots.isNotEmpty()) {
         Assumptions.assumeTrue(os.contains(osForScreenshots),
             "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)"
