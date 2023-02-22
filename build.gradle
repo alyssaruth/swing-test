@@ -2,11 +2,10 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id "maven-publish"
+    id 'java-library'
+    id 'signing'
     id 'org.jetbrains.dokka' version '0.10.1'
 }
-
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 group 'com.github.alyssaburlton'
 version '2.0.0'
@@ -61,10 +60,6 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
-signing {
-    sign configurations.archives
-}
-
 java {
     withJavadocJar()
     withSourcesJar()
@@ -77,28 +72,19 @@ ext["ossrhUsername"] = ''
 ext["ossrhPassword"] = ''
 ext["sonatypeStagingProfileId"] = ''
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'com.github.alyssaburlton'
+            artifactId = 'swing-test'
+            version = '2.0.0'
 
-            repository(url: "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
+            from components.java
 
-            snapshotRepository(url: "https://s01.oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
-            }
-
-            pom.project {
-                name 'swing-test'
-                packaging 'jar'
-                description 'Kotlin swing testing library'
-                url 'https://github.com/alyssaburlton/swing-test'
-
-                scm {
-                    url = "https://github.com/alyssaburlton/swing-test"
-                }
+            pom {
+                name = 'swing-test'
+                description = 'Kotlin swing testing library'
+                url = 'https://github.com/alyssaburlton/swing-test'
 
                 licenses {
                     license {
@@ -113,7 +99,26 @@ uploadArchives {
                         name = 'Alyssa Burlton'
                     }
                 }
+
+                scm {
+                    url = "https://github.com/alyssaburlton/swing-test"
+                }
             }
         }
     }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = project.ossrhUsername
+                password = project.ossrhPassword
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.release
 }
