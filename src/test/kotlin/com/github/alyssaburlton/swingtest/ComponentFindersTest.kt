@@ -58,26 +58,26 @@ class ComponentFindersTest {
             panel.findChild<JButton>()
         }
 
-        e.message shouldBe "Found 2 JButtons, expected 1 or 0. Text [null], ToolTipText [null]"
+        e.message shouldBe "Found 2 JButtons, expected 1 or 0. name [null], Text [null]"
     }
 
     @Test
-    fun `MultipleComponentsException should include text and toolTipText`() {
+    fun `MultipleComponentsException should include text and name`() {
         val panel = JPanel()
         val buttonA = JButton("Button")
-        buttonA.toolTipText = "Click me"
+        buttonA.name = "ButtonOne"
 
         val buttonB = JButton("Button")
-        buttonB.toolTipText = "Click me"
+        buttonB.name = "ButtonOne"
 
         panel.add(buttonA)
         panel.add(buttonB)
 
         val e = shouldThrow<MultipleComponentsException> {
-            panel.findChild<JButton>(text = "Button", toolTipText = "Click me")
+            panel.findChild<JButton>(text = "Button", name = "ButtonOne")
         }
 
-        e.message shouldBe "Found 2 JButtons, expected 1 or 0. Text [Button], ToolTipText [Click me]"
+        e.message shouldBe "Found 2 JButtons, expected 1 or 0. name [ButtonOne], Text [Button]"
     }
 
     @Test
@@ -105,19 +105,19 @@ class ComponentFindersTest {
     }
 
     @Test
-    fun `Should filter by toolTipText correctly`() {
+    fun `Should filter by name correctly`() {
         val panel = JPanel()
         val labelA = JLabel("")
         val labelB = JLabel("")
         panel.add(labelA)
         panel.add(labelB)
 
-        labelA.toolTipText = "Label 1"
-        labelB.toolTipText = "Label 2"
+        labelA.name = "Label 1"
+        labelB.name = "Label 2"
 
-        panel.findChild<JLabel>(toolTipText = "Label 1") shouldBe labelA
-        panel.findChild<JLabel>(toolTipText = "Label 2") shouldBe labelB
-        panel.findChild<JLabel>(toolTipText = "zz") shouldBe null
+        panel.findChild<JLabel>(name = "Label 1") shouldBe labelA
+        panel.findChild<JLabel>(name = "Label 2") shouldBe labelB
+        panel.findChild<JLabel>(name = "zz") shouldBe null
     }
 
     @Test
@@ -140,19 +140,19 @@ class ComponentFindersTest {
         val panel = JPanel()
 
         val expected = JButton("Button Text")
-        expected.toolTipText = "Yes"
+        expected.name = "Yes"
 
         val wrongType = JRadioButton("Button Text")
-        wrongType.toolTipText = "Yes"
+        wrongType.name = "Yes"
 
         val wrongText = JButton("Other Text")
-        wrongText.toolTipText = "Yes"
+        wrongText.name = "Yes"
 
         val wrongToolTip = JButton("Button Text")
-        wrongToolTip.toolTipText = "No"
+        wrongToolTip.name = "No"
 
         val disabled = JButton("Button Text")
-        disabled.toolTipText = "Yes"
+        disabled.name = "Yes"
         disabled.isEnabled = false
 
         panel.add(expected)
@@ -162,7 +162,7 @@ class ComponentFindersTest {
         panel.add(disabled)
 
         @Suppress("unused")
-        panel.findChild<JButton>(text = "Button Text", toolTipText = "Yes") { it.isEnabled } shouldBe expected
+        panel.findChild<JButton>(text = "Button Text", name = "Yes") { it.isEnabled } shouldBe expected
     }
 
     @Test
@@ -188,7 +188,7 @@ class ComponentFindersTest {
         panel.add(buttonA)
         panel.add(buttonB)
 
-        panel.clickChild<JButton>("A")
+        panel.clickChild<JButton>(text = "A")
 
         verify { listenerA.actionPerformed(any()) }
         verifyNotCalled { listenerB.actionPerformed(any()) }
