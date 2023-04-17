@@ -159,14 +159,6 @@ class SwingSnapshotsTest {
     }
 
     @Test
-    fun `what the fuck`() {
-        val img1 = ImageComparisonUtil.readImageFromResources("images/dartboard-1.png")
-        val img2 = ImageComparisonUtil.readImageFromResources("images/dartboard-2.png")
-
-        img1.isEqual(img2) shouldBe false
-    }
-
-    @Test
     fun `Should write a snapshot of the correct size`() {
         val labelA = JLabel("A")
         labelA.size = Dimension(500, 15)

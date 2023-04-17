@@ -114,12 +114,6 @@ private fun verifyOs() {
 
 fun BufferedImage.isEqual(other: BufferedImage): Boolean {
     if (width != other.width || height != other.height) return false
-
-    val mismatches = getPointList(width, height).filter { getRGB(it.x, it.y) != other.getRGB(it.x, it.y) }
-    println(mismatches)
-    println(mismatches.map { getRGB(it.x, it.y) })
-    println(mismatches.map { other.getRGB(it.x, it.y) })
-
     return getPointList(width, height).all { getRGB(it.x, it.y) == other.getRGB(it.x, it.y) }
 }
 
