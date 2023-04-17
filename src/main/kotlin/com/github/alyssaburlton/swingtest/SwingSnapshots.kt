@@ -1,6 +1,7 @@
 package com.github.alyssaburlton.swingtest
 
 import com.github.romankh3.image.comparison.ImageComparison
+import com.github.romankh3.image.comparison.model.ImageComparisonResult
 import com.github.romankh3.image.comparison.model.ImageComparisonState
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
@@ -51,7 +52,7 @@ private fun JComponent.getHeightForSnapshot(): Int = when {
 }
 
 @JvmOverloads
-fun JComponent.shouldMatchImage(imageName: String, pixelTolerance: Double = 0.1, failingPixelsThreshold: Double = 0.0) {
+fun JComponent.shouldMatchImage(imageName: String, pixelTolerance: Double = 0.01, failingPixelsThreshold: Double = 0.0) {
     verifyOs()
 
     val overwrite = System.getProperty(ENV_UPDATE_SNAPSHOT) == "true"
@@ -85,9 +86,18 @@ fun JComponent.shouldMatchImage(imageName: String, pixelTolerance: Double = 0.1,
             val comparisonFile = File("$imgPath/$imageName.comparison.png")
             ImageIO.write(result.result, "png", comparisonFile)
 
-            fail("Snapshot image did not match: $imgPath/$imageName.png. Run with system property -DupdateSnapshots=true to overwrite.")
+            val message = "Snapshot image did not match: $imgPath/$imageName.png.\n" +
+                "A difference of ${result.differencePercentString()}% was detected\n" +
+                "See $imageName.failed.png and $imageName.comparison.png in the same directory for details.\n\n" +
+                "Run with system property -DupdateSnapshots=true to overwrite."
+
+            fail(message)
         }
     }
+}
+
+private fun ImageComparisonResult.differencePercentString(): String {
+    return "%.2f".format(100 * differencePercent)
 }
 
 private fun verifyOs() {
@@ -104,6 +114,12 @@ private fun verifyOs() {
 
 fun BufferedImage.isEqual(other: BufferedImage): Boolean {
     if (width != other.width || height != other.height) return false
+
+    val mismatches = getPointList(width, height).filter { getRGB(it.x, it.y) != other.getRGB(it.x, it.y) }
+    println(mismatches)
+    println(mismatches.map { getRGB(it.x, it.y) })
+    println(mismatches.map { other.getRGB(it.x, it.y) })
+
     return getPointList(width, height).all { getRGB(it.x, it.y) == other.getRGB(it.x, it.y) }
 }
 

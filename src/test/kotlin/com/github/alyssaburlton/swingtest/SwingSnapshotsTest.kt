@@ -104,7 +104,10 @@ class SwingSnapshotsTest {
             otherLabel.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png. Run with system property -DupdateSnapshots=true to overwrite."
+        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png.\n" +
+                "A difference of 6.69% was detected\n" +
+                "See Image.failed.png and Image.comparison.png in the same directory for details.\n\n" +
+                "Run with system property -DupdateSnapshots=true to overwrite."
 
         val originalFile = File("$resourceLocation/Image.png")
         val failedFile = File("$resourceLocation/Image.failed.png")
@@ -131,6 +134,36 @@ class SwingSnapshotsTest {
 
         File("$resourceLocation/Image.png").shouldExist()
         File("$resourceLocation/Image.failed.png").shouldNotExist()
+    }
+
+    @Test
+    fun `Should have a built-in tolerance for subtle differences`() {
+        val dartboard1 = resourceAsLabel("/images/dartboard-1.png")
+        dartboard1.createImageFile("dartboard")
+
+        val dartboard2 = resourceAsLabel("/images/dartboard-2.png")
+        shouldNotThrowAny {
+            dartboard2.shouldMatchImage("dartboard")
+        }
+    }
+
+    @Test
+    fun `Should support precise matching`() {
+        val dartboard1 = resourceAsLabel("/images/dartboard-1.png")
+        dartboard1.createImageFile("dartboard")
+
+        val dartboard2 = resourceAsLabel("/images/dartboard-2.png")
+        shouldThrow<AssertionError> {
+            dartboard2.shouldMatchImage("dartboard", pixelTolerance = 0.0)
+        }
+    }
+
+    @Test
+    fun `what the fuck`() {
+        val img1 = ImageComparisonUtil.readImageFromResources("images/dartboard-1.png")
+        val img2 = ImageComparisonUtil.readImageFromResources("images/dartboard-2.png")
+
+        img1.isEqual(img2) shouldBe false
     }
 
     @Test
@@ -200,6 +233,11 @@ class SwingSnapshotsTest {
         shouldThrow<AssertionError> {
             icon.shouldMatch(nonMatchingIcon)
         }
+    }
+
+    private fun resourceAsLabel(resourcePath: String): JLabel {
+        val icon = ImageIcon(javaClass.getResource(resourcePath))
+        return JLabel(icon).also { it.size = Dimension(icon.iconWidth, icon.iconHeight) }
     }
 
     private fun JComponent.createImageFile(filename: String) {
