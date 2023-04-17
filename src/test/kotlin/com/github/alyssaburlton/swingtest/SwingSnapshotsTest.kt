@@ -1,5 +1,6 @@
 package com.github.alyssaburlton.swingtest
 
+import com.github.romankh3.image.comparison.ImageComparisonUtil
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
@@ -97,6 +98,7 @@ class SwingSnapshotsTest {
         comp.createImageFile("Image")
 
         val otherLabel = makeComponent("Label B")
+        val comparisonImage = ImageComparisonUtil.readImageFromResources("images/LabelComparisonResult.png")
 
         val exception = shouldThrow<AssertionError> {
             otherLabel.shouldMatchImage("Image")
@@ -106,12 +108,15 @@ class SwingSnapshotsTest {
 
         val originalFile = File("$resourceLocation/Image.png")
         val failedFile = File("$resourceLocation/Image.failed.png")
+        val comparisonFile = File("$resourceLocation/Image.comparison.png")
 
         originalFile.shouldExist()
         failedFile.shouldExist()
+        comparisonFile.shouldExist()
 
         ImageIO.read(originalFile).isEqual(comp.toBufferedImage()) shouldBe true
         ImageIO.read(failedFile).isEqual(otherLabel.toBufferedImage()) shouldBe true
+        ImageIO.read(comparisonFile).isEqual(comparisonImage) shouldBe true
     }
 
     @Test

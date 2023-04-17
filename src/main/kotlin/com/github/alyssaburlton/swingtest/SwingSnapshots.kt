@@ -1,5 +1,8 @@
 package com.github.alyssaburlton.swingtest
 
+import com.github.romankh3.image.comparison.ImageComparison
+import com.github.romankh3.image.comparison.ImageComparisonUtil
+import com.github.romankh3.image.comparison.model.ImageComparisonState
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assumptions
@@ -70,10 +73,15 @@ fun JComponent.shouldMatchImage(imageName: String) {
         ImageIO.write(img, "png", file)
     } else {
         val savedImg = ImageIO.read(file)
-        val match = img.isEqual(savedImg)
-        if (!match) {
+        val result = ImageComparison(savedImg, img).compareImages()
+
+        if (result.imageComparisonState != ImageComparisonState.MATCH) {
             val failedFile = File("$imgPath/$imageName.failed.png")
             ImageIO.write(img, "png", failedFile)
+
+            val comparisonFile = File("$imgPath/$imageName.comparison.png")
+            ImageIO.write(result.result, "png", comparisonFile)
+
             fail("Snapshot image did not match: $imgPath/$imageName.png. Run with system property -DupdateSnapshots=true to overwrite.")
         }
     }
