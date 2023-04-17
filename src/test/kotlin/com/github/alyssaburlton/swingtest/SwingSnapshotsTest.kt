@@ -1,5 +1,6 @@
 package com.github.alyssaburlton.swingtest
 
+import com.github.romankh3.image.comparison.ImageComparisonUtil
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
@@ -93,25 +94,32 @@ class SwingSnapshotsTest {
 
     @Test
     fun `Should fail and write out the correct comparison file`() {
-        val comp = makeComponent("Label A")
-        comp.createImageFile("Image")
+        val lblA = resourceAsLabel("/images/label-a.png")
+        lblA.createImageFile("Image")
 
-        val otherLabel = makeComponent("Label B")
+        val lblB = resourceAsLabel("/images/label-b.png")
+        val comparisonImage = ImageComparisonUtil.readImageFromResources("images/LabelComparisonResult.png")
 
         val exception = shouldThrow<AssertionError> {
-            otherLabel.shouldMatchImage("Image")
+            lblB.shouldMatchImage("Image")
         }
 
-        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png. Run with system property -DupdateSnapshots=true to overwrite."
+        exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png.\n" +
+                "A difference of 6.69% was detected\n" +
+                "See Image.failed.png and Image.comparison.png in the same directory for details.\n\n" +
+                "Run with system property -DupdateSnapshots=true to overwrite."
 
         val originalFile = File("$resourceLocation/Image.png")
         val failedFile = File("$resourceLocation/Image.failed.png")
+        val comparisonFile = File("$resourceLocation/Image.comparison.png")
 
         originalFile.shouldExist()
         failedFile.shouldExist()
+        comparisonFile.shouldExist()
 
-        ImageIO.read(originalFile).isEqual(comp.toBufferedImage()) shouldBe true
-        ImageIO.read(failedFile).isEqual(otherLabel.toBufferedImage()) shouldBe true
+        ImageIO.read(originalFile).isEqual(lblA.toBufferedImage()) shouldBe true
+        ImageIO.read(failedFile).isEqual(lblB.toBufferedImage()) shouldBe true
+        ImageIO.read(comparisonFile).isEqual(comparisonImage) shouldBe true
     }
 
     @Test
@@ -126,6 +134,28 @@ class SwingSnapshotsTest {
 
         File("$resourceLocation/Image.png").shouldExist()
         File("$resourceLocation/Image.failed.png").shouldNotExist()
+    }
+
+    @Test
+    fun `Should have a built-in tolerance for subtle differences`() {
+        val dartboard1 = resourceAsLabel("/images/dartboard-1.png")
+        dartboard1.createImageFile("dartboard")
+
+        val dartboard2 = resourceAsLabel("/images/dartboard-2.png")
+        shouldNotThrowAny {
+            dartboard2.shouldMatchImage("dartboard")
+        }
+    }
+
+    @Test
+    fun `Should support precise matching`() {
+        val dartboard1 = resourceAsLabel("/images/dartboard-1.png")
+        dartboard1.createImageFile("dartboard")
+
+        val dartboard2 = resourceAsLabel("/images/dartboard-2.png")
+        shouldThrow<AssertionError> {
+            dartboard2.shouldMatchImage("dartboard", pixelTolerance = 0.0)
+        }
     }
 
     @Test
@@ -195,6 +225,11 @@ class SwingSnapshotsTest {
         shouldThrow<AssertionError> {
             icon.shouldMatch(nonMatchingIcon)
         }
+    }
+
+    private fun resourceAsLabel(resourcePath: String): JLabel {
+        val icon = ImageIcon(javaClass.getResource(resourcePath))
+        return JLabel(icon).also { it.size = Dimension(icon.iconWidth, icon.iconHeight) }
     }
 
     private fun JComponent.createImageFile(filename: String) {

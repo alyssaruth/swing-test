@@ -8,13 +8,14 @@ plugins {
 }
 
 group 'com.github.alexburlton'
-version '2.0.0'
+version '3.0.0'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
+    implementation 'com.github.romankh3:image-comparison:4.4.0'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0"
     implementation 'io.kotest:kotest-assertions-core:5.5.4'
     implementation "org.junit.jupiter:junit-jupiter-api:5.9.2"
@@ -70,7 +71,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId = 'com.github.alexburlton'
             artifactId = 'swing-test'
-            version = '2.0.0'
+            version = '3.0.0'
             from components.java
 
             pom {

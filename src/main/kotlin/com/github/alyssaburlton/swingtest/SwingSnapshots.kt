@@ -1,5 +1,8 @@
 package com.github.alyssaburlton.swingtest
 
+import com.github.romankh3.image.comparison.ImageComparison
+import com.github.romankh3.image.comparison.model.ImageComparisonResult
+import com.github.romankh3.image.comparison.model.ImageComparisonState
 import io.kotest.assertions.fail
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Assumptions
@@ -15,12 +18,10 @@ const val ENV_SCREENSHOT_OS = "screenshotOs"
 private const val DEFAULT_WIDTH = 200
 private const val DEFAULT_HEIGHT = 200
 
-fun Icon.shouldMatch(other: Icon)
-{
+fun Icon.shouldMatch(other: Icon) {
     toBufferedImage().isEqual(other.toBufferedImage()) shouldBe true
 }
-private fun Icon.toBufferedImage(): BufferedImage
-{
+private fun Icon.toBufferedImage(): BufferedImage {
     val bi = BufferedImage(iconWidth, iconHeight, BufferedImage.TYPE_INT_RGB)
     val g = bi.createGraphics()
     paintIcon(null, g, 0, 0)
@@ -31,7 +32,7 @@ private fun Icon.toBufferedImage(): BufferedImage
 fun JComponent.toBufferedImage(): BufferedImage {
     val width = getWidthForSnapshot()
     val height = getHeightForSnapshot()
-    
+
     val img = BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
     val g2 = img.createGraphics()
     paint(g2)
@@ -50,13 +51,16 @@ private fun JComponent.getHeightForSnapshot(): Int = when {
     else -> DEFAULT_HEIGHT
 }
 
-fun JComponent.shouldMatchImage(imageName: String) {
+@JvmOverloads
+fun JComponent.shouldMatchImage(imageName: String, pixelTolerance: Double = 0.01, failingPixelsThreshold: Double = 0.0) {
     verifyOs()
 
     val overwrite = System.getProperty(ENV_UPDATE_SNAPSHOT) == "true"
     val img = toBufferedImage()
 
-    val callingSite = Throwable().stackTrace[1].className
+    val stackFrames = Throwable().stackTrace.toList()
+
+    val callingSite = stackFrames.first { it.className != "com.github.alyssaburlton.swingtest.SwingSnapshotsKt" }.className
     val imgPath = "src/test/resources/__snapshots__/$callingSite"
 
     val file = File("$imgPath/$imageName.png")
@@ -70,13 +74,30 @@ fun JComponent.shouldMatchImage(imageName: String) {
         ImageIO.write(img, "png", file)
     } else {
         val savedImg = ImageIO.read(file)
-        val match = img.isEqual(savedImg)
-        if (!match) {
+        val result = ImageComparison(savedImg, img)
+            .setPixelToleranceLevel(pixelTolerance)
+            .setAllowingPercentOfDifferentPixels(failingPixelsThreshold)
+            .compareImages()
+
+        if (result.imageComparisonState != ImageComparisonState.MATCH) {
             val failedFile = File("$imgPath/$imageName.failed.png")
             ImageIO.write(img, "png", failedFile)
-            fail("Snapshot image did not match: $imgPath/$imageName.png. Run with system property -DupdateSnapshots=true to overwrite.")
+
+            val comparisonFile = File("$imgPath/$imageName.comparison.png")
+            ImageIO.write(result.result, "png", comparisonFile)
+
+            val message = "Snapshot image did not match: $imgPath/$imageName.png.\n" +
+                "A difference of ${result.differencePercentString()}% was detected\n" +
+                "See $imageName.failed.png and $imageName.comparison.png in the same directory for details.\n\n" +
+                "Run with system property -DupdateSnapshots=true to overwrite."
+
+            fail(message)
         }
     }
+}
+
+private fun ImageComparisonResult.differencePercentString(): String {
+    return "%.2f".format(100 * differencePercent)
 }
 
 private fun verifyOs() {
@@ -84,8 +105,9 @@ private fun verifyOs() {
 
     val os = System.getProperty("os.name").lowercase()
     if (osForScreenshots.isNotEmpty()) {
-        Assumptions.assumeTrue(os.contains(osForScreenshots),
-            "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)"
+        Assumptions.assumeTrue(
+            os.contains(osForScreenshots),
+            "Wrong OS for screenshot tests (wanted $osForScreenshots, found $os)",
         )
     }
 }
