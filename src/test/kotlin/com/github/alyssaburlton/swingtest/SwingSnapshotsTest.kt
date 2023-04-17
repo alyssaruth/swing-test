@@ -94,14 +94,14 @@ class SwingSnapshotsTest {
 
     @Test
     fun `Should fail and write out the correct comparison file`() {
-        val comp = makeComponent("Label A")
-        comp.createImageFile("Image")
+        val lblA = resourceAsLabel("/images/label-a.png")
+        lblA.createImageFile("Image")
 
-        val otherLabel = makeComponent("Label B")
+        val lblB = resourceAsLabel("/images/label-b.png")
         val comparisonImage = ImageComparisonUtil.readImageFromResources("images/LabelComparisonResult.png")
 
         val exception = shouldThrow<AssertionError> {
-            otherLabel.shouldMatchImage("Image")
+            lblB.shouldMatchImage("Image")
         }
 
         exception.message shouldBe "Snapshot image did not match: $resourceLocation/Image.png.\n" +
@@ -117,8 +117,8 @@ class SwingSnapshotsTest {
         failedFile.shouldExist()
         comparisonFile.shouldExist()
 
-        ImageIO.read(originalFile).isEqual(comp.toBufferedImage()) shouldBe true
-        ImageIO.read(failedFile).isEqual(otherLabel.toBufferedImage()) shouldBe true
+        ImageIO.read(originalFile).isEqual(lblA.toBufferedImage()) shouldBe true
+        ImageIO.read(failedFile).isEqual(lblB.toBufferedImage()) shouldBe true
         ImageIO.read(comparisonFile).isEqual(comparisonImage) shouldBe true
     }
 
