@@ -2,7 +2,17 @@ package com.github.alyssaburlton.swingtest
 
 import java.awt.Component
 import java.awt.Container
+import java.awt.Window
 import javax.swing.AbstractButton
+
+/**
+ * Finds a window of a given type, optionally matching a predicate.
+ *
+ * @param W: The class of window to find
+ * @param predicate: A predicate to match against the window
+ */
+inline fun <reified W : Window> findWindow(predicate: (window: W) -> Boolean = { true }): W? =
+    Window.getWindows().find { it is W && predicate(it) } as? W
 
 /**
  * Finds all child components of a given type, recursing through child containers.
@@ -56,7 +66,7 @@ class NoSuchComponentException(override val message: String) : Exception(message
 inline fun <reified T : Component> Container.findChild(
     name: String? = null,
     text: String? = null,
-    noinline filterFn: ((T) -> Boolean)? = null
+    noinline filterFn: ((T) -> Boolean)? = null,
 ): T? = findChild(T::class.java, name, text, filterFn)
 
 /**
@@ -78,7 +88,7 @@ fun <T : Component> Container.findChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    filterFn: ((T) -> Boolean)? = null
+    filterFn: ((T) -> Boolean)? = null,
 ): T? {
     val allComponents = findAll(clazz)
 
@@ -96,7 +106,7 @@ fun <T : Component> Container.findChild(
 private fun <T : Component> filterByText(
     clazz: Class<T>,
     components: List<T>,
-    match: String?
+    match: String?,
 ): List<T> {
     match ?: return components
 
@@ -124,7 +134,7 @@ private fun <T : Component> filterByText(
 inline fun <reified T : Component> Container.getChild(
     name: String? = null,
     text: String? = null,
-    noinline filterFn: ((T) -> Boolean)? = null
+    noinline filterFn: ((T) -> Boolean)? = null,
 ): T = getChild(T::class.java, name, text, filterFn)
 
 /**
@@ -147,7 +157,7 @@ fun <T : Component> Container.getChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    filterFn: ((T) -> Boolean)? = null
+    filterFn: ((T) -> Boolean)? = null,
 ): T = findChild(clazz, name, text, filterFn)
     ?: throw NoSuchComponentException("Found 0 ${clazz.simpleName}s. Text [$text], name [$name]")
 
@@ -166,7 +176,7 @@ fun <T : Component> Container.getChild(
 inline fun <reified T : AbstractButton> Container.clickChild(
     name: String? = null,
     text: String? = null,
-    noinline filterFn: ((T) -> Boolean)? = null
+    noinline filterFn: ((T) -> Boolean)? = null,
 ) {
     clickChild(T::class.java, name, text, filterFn)
 }
@@ -189,7 +199,7 @@ fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    filterFn: ((T) -> Boolean)? = null
+    filterFn: ((T) -> Boolean)? = null,
 ) {
     getChild(clazz, name, text, filterFn).doClick()
 }
