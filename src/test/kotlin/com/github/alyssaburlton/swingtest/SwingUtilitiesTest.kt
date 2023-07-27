@@ -2,6 +2,7 @@ package com.github.alyssaburlton.swingtest
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
@@ -35,7 +36,7 @@ class SwingUtilitiesTest {
         t.start()
 
         shouldNotThrowAny {
-            awaitCondition { result }
+            waitForAssertion { result shouldBe true }
         }
     }
 
@@ -50,8 +51,13 @@ class SwingUtilitiesTest {
 
         t.start()
 
-        shouldThrow<AssertionError> {
-            awaitCondition(timeout = 1000) { result }
+        val e = shouldThrow<AssertionError> {
+            waitForAssertion(timeout = 1000) { result shouldBe true }
         }
+
+        e.message shouldBe "Timed out waiting for assertion - see cause for details"
+
+        val cause = e.cause!!
+        cause.message shouldBe "expected:<true> but was:<false>"
     }
 }
