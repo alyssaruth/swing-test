@@ -7,15 +7,20 @@ fun flushEdt() {
     SwingUtilities.invokeAndWait(lambda)
 }
 
-fun awaitCondition(timeout: Int = 10000, condition: (() -> Boolean))
-{
+fun waitForAssertion(timeout: Int = 10000, assertion: (() -> Unit)) {
+    var passed = false
     val startTime = System.currentTimeMillis()
-    while (!condition()) {
-        Thread.sleep(200)
+    while (!passed) {
+        try {
+            assertion()
+            passed = true
+        } catch (e: AssertionError) {
+            Thread.sleep(200)
 
-        val elapsed = System.currentTimeMillis() - startTime
-        if (elapsed > timeout) {
-            throw AssertionError("Timed out waiting for condition")
+            val elapsed = System.currentTimeMillis() - startTime
+            if (elapsed > timeout) {
+                throw AssertionError("Timed out waiting for assertion - see cause for details", e)
+            }
         }
     }
 }
