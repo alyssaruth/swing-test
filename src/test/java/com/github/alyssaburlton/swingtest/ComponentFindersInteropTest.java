@@ -2,11 +2,25 @@ package com.github.alyssaburlton.swingtest;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.swing.*;
 import java.util.List;
 
+@ExtendWith(SwingTestCleanupExtension.class)
 public class ComponentFindersInteropTest {
+    @Test
+    public void findWindow() {
+        JFrame frame = new JFrame();
+        frame.setName("TestFrame");
+
+        JFrame other = new JFrame();
+        other.setName("OtherFrame");
+
+        JFrame result = ComponentFindersKt.findWindow(JFrame.class, jFrame -> jFrame.getName().equals("TestFrame"));
+        Assertions.assertEquals(result, frame);
+    }
+
     @Test
     public void findAll() {
         JPanel panel = new JPanel();

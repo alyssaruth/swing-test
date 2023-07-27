@@ -7,10 +7,63 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.awt.event.ActionListener
-import javax.swing.*
+import javax.swing.AbstractButton
+import javax.swing.JButton
+import javax.swing.JDialog
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JRadioButton
 
+@ExtendWith(SwingTestCleanupExtension::class)
 class ComponentFindersTest {
+    @Test
+    fun `Should be able to find windows by type`() {
+        val frame = JFrame()
+        val dlg = JDialog()
+
+        findWindow<JFrame>() shouldBe frame
+        findWindow<JDialog>() shouldBe dlg
+    }
+
+    @Test
+    fun `Should be able to find windows of same type via lambda`() {
+        val frameOne = JFrame("One")
+        val frameTwo = JFrame("Two")
+
+        findWindow<JFrame> { it.title == "One" } shouldBe frameOne
+        findWindow<JFrame> { it.title == "Two" } shouldBe frameTwo
+    }
+
+    @Test
+    fun `Should throw MultipleWindowsException if more than one matching window is found`() {
+        JFrame("One")
+        JFrame("Two")
+
+        val e = shouldThrow<MultipleWindowsException> {
+            findWindow<JFrame>()
+        }
+
+        e.message shouldBe """
+            Found 2 JFrames, expected 1 or 0:
+
+            JFrame - "One" - BorderLayout [name: frame0]
+            |- [Center] JRootPane - RootLayout
+              |- JPanel - FlowLayout [name: null.glassPane]
+              |- JLayeredPane - null [name: null.layeredPane]
+                |- JPanel - javax.swing.JRootPane${'$'}1 [name: null.contentPane]
+            ------
+            JFrame - "Two" - BorderLayout [name: frame1]
+            |- [Center] JRootPane - RootLayout
+              |- JPanel - FlowLayout [name: null.glassPane]
+              |- JLayeredPane - null [name: null.layeredPane]
+                |- JPanel - javax.swing.JRootPane${'$'}1 [name: null.contentPane]
+
+        """.trimIndent()
+    }
+
     @Test
     fun `Should find all components of a given type`() {
         val panel = JPanel()
@@ -58,7 +111,16 @@ class ComponentFindersTest {
             panel.findChild<JButton>()
         }
 
-        e.message shouldBe "Found 2 JButtons, expected 1 or 0. name [null], Text [null]"
+        e.message shouldBe """
+            Found 2 JButtons, expected 1 or 0. name [null], Text [null]. 
+
+            Component tree:
+            
+            JPanel - FlowLayout
+            |- JButton - "A"
+            |- JButton - "B"
+            
+        """.trimIndent()
     }
 
     @Test
@@ -77,7 +139,16 @@ class ComponentFindersTest {
             panel.findChild<JButton>(text = "Button", name = "ButtonOne")
         }
 
-        e.message shouldBe "Found 2 JButtons, expected 1 or 0. name [ButtonOne], Text [Button]"
+        e.message shouldBe """
+            Found 2 JButtons, expected 1 or 0. name [ButtonOne], Text [Button]. 
+
+            Component tree:
+
+            JPanel - FlowLayout
+            |- JButton - "Button" [name: ButtonOne]
+            |- JButton - "Button" [name: ButtonOne]
+            
+        """.trimIndent()
     }
 
     @Test
@@ -161,18 +232,29 @@ class ComponentFindersTest {
         panel.add(wrongToolTip)
         panel.add(disabled)
 
-        @Suppress("unused")
         panel.findChild<JButton>(text = "Button Text", name = "Yes") { it.isEnabled } shouldBe expected
     }
 
     @Test
     fun `Should handle an absent child component correctly`() {
         val panel = JPanel()
+        panel.add(JRadioButton("A"))
+
         panel.findChild<JButton>().shouldBeNull()
 
-        shouldThrow<NoSuchComponentException> {
+        val e = shouldThrow<NoSuchComponentException> {
             panel.getChild<JButton>()
         }
+
+        e.message shouldBe """
+            Found 0 JButtons. Text [null], name [null]. 
+
+            Component tree:
+
+            JPanel - FlowLayout
+            |- JRadioButton - "A"
+            
+        """.trimIndent()
     }
 
     @Test

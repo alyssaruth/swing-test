@@ -48,6 +48,22 @@ val table = myContainer.getChild<JTable>()
 table.simulateKeyPress(KeyEvent.VK_ENTER) //Simulate the enter key being pressed
 ```
 
+Easy debugging with component trees :evergreen_tree:
+----------------------------------------------------
+
+Many failing assertions will provide a useful error message that includes the component tree, for example:
+
+```
+com.github.alyssaburlton.swingtest.NoSuchComponentException: Found 0 JButtons. Text [null], name [null]. 
+
+Component tree:
+
+JPanel - FlowLayout
+|- JRadioButton - "A"
+```
+
+These can also be generated manually via the extension method `Container.generateComponentTree()`
+
 Snapshot Testing :camera_flash:
 -------------------------------
 
@@ -88,9 +104,11 @@ Although swing-test is developed with Kotlin in mind, it fully supports raw Java
 
 ```
 Component myComponent = new CustomComponent();
-SwingSnapshotsKt.shouldMatchImage(myComponent,"Default");
+SwingSnapshotsKt.shouldMatchImage(myComponent, "Default");
 
-List<JButton> buttons=ComponentFindersKt.findAll(myComponent,JButton.class);
+List<JButton> buttons=ComponentFindersKt.findAll(myComponent, JButton.class);
 
 ComponentInteractionsKt.doHover(myComponent);
+
+SwingDebug.dumpComponentTree(myComponent);
 ```
