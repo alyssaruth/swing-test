@@ -7,8 +7,21 @@ import io.mockk.verify
 import io.mockk.verifySequence
 import org.junit.jupiter.api.Test
 import java.awt.Component
-import java.awt.event.*
-import javax.swing.*
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
+import java.awt.event.KeyEvent
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
+import java.awt.event.MouseMotionListener
+import javax.swing.AbstractAction
+import javax.swing.JCheckBox
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JTable
+import javax.swing.JTextField
+import javax.swing.KeyStroke
 
 class ComponentInteractionsTest {
     @Test
@@ -181,6 +194,13 @@ class ComponentInteractionsTest {
         verify {
             listener.actionPerformed(any())
         }
+    }
+
+    @Test
+    fun `Should type text into a text component`() {
+        val textField = JTextField()
+        textField.typeText("Hello, World!")
+        textField.text shouldBe "Hello, World!"
     }
 
     private fun MockKMatcherScope.eventWithClickCount(count: Int) = match<MouseEvent> {

@@ -5,9 +5,20 @@ import java.awt.event.FocusEvent
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
+import javax.swing.text.JTextComponent
+
+fun maybeAsync(async: Boolean, interaction: () -> Unit) {
+    if (async) {
+        SwingUtilities.invokeLater(interaction)
+        flushEdt()
+    } else {
+        SwingUtilities.invokeAndWait(interaction)
+    }
+}
 
 @JvmOverloads
-fun Component.doClick(x: Int = 0, y: Int = 0) {
+fun Component.doClick(x: Int = 0, y: Int = 0, async: Boolean = false) = maybeAsync(async) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach {
         it.mouseClicked(me)
@@ -16,7 +27,7 @@ fun Component.doClick(x: Int = 0, y: Int = 0) {
 }
 
 @JvmOverloads
-fun Component.doubleClick(x: Int = 0, y: Int = 0) {
+fun Component.doubleClick(x: Int = 0, y: Int = 0, async: Boolean = false) = maybeAsync(async) {
     val me = makeMouseEvent(this, x = x, y = y, clickCount = 2)
     mouseListeners.forEach {
         it.mouseClicked(me)
@@ -25,48 +36,59 @@ fun Component.doubleClick(x: Int = 0, y: Int = 0) {
 }
 
 @JvmOverloads
-fun Component.doHover(x: Int = 0, y: Int = 0) {
+fun Component.doHover(x: Int = 0, y: Int = 0, async: Boolean = false) = maybeAsync(async) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach { it.mouseEntered(me) }
 }
 
 @JvmOverloads
-fun Component.doHoverAway(x: Int = 0, y: Int = 0) {
+fun Component.doHoverAway(x: Int = 0, y: Int = 0, async: Boolean = false) = maybeAsync(async) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseListeners.forEach { it.mouseExited(me) }
 }
 
-fun Component.doMouseMove() {
+@JvmOverloads
+fun Component.doMouseMove(async: Boolean = false) = maybeAsync(async) {
     val me = makeMouseEvent(this, x = x, y = y)
     mouseMotionListeners.forEach { it.mouseMoved(me) }
 }
 
-fun JComponent.processKeyPress(key: Int) {
+@JvmOverloads
+fun JComponent.processKeyPress(key: Int, async: Boolean = false) = maybeAsync(async) {
     val actionName = inputMap[KeyStroke.getKeyStroke(key, JComponent.WHEN_FOCUSED)]
     if (!actionMap.keys().contains(actionName)) {
-        return
+        return@maybeAsync
     }
 
     val action = actionMap[actionName]
     action.actionPerformed(makeActionEvent(this))
 }
 
-fun JComponent.doLoseFocus() {
+@JvmOverloads
+fun JComponent.doLoseFocus(async: Boolean = false) = maybeAsync(async) {
     focusListeners.forEach { it.focusLost(FocusEvent(this, FocusEvent.FOCUS_LOST)) }
 }
 
-fun JComponent.doGainFocus() {
+@JvmOverloads
+fun JComponent.doGainFocus(async: Boolean = false) = maybeAsync(async) {
     focusListeners.forEach { it.focusGained(FocusEvent(this, FocusEvent.FOCUS_GAINED)) }
 }
 
-fun JCheckBox.check() {
+@JvmOverloads
+fun JCheckBox.check(async: Boolean = false) = maybeAsync(async) {
     if (!isSelected) {
         doClick()
     }
 }
 
-fun JCheckBox.uncheck() {
+@JvmOverloads
+fun JCheckBox.uncheck(async: Boolean = false) = maybeAsync(async) {
     if (isSelected) {
         doClick()
     }
+}
+
+@JvmOverloads
+fun JTextComponent.typeText(newText: String, async: Boolean = false) = maybeAsync(async) {
+    text = newText
 }
