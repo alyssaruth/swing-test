@@ -4,11 +4,8 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
-import io.mockk.mockk
-import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.awt.event.ActionListener
 import javax.swing.AbstractButton
 import javax.swing.JButton
 import javax.swing.JDialog
@@ -255,24 +252,5 @@ class ComponentFindersTest {
             |- JRadioButton - "A"
             
         """.trimIndent()
-    }
-
-    @Test
-    fun `Should click a child button and trigger its ActionListeners`() {
-        val panel = JPanel()
-        val buttonA = JButton("A")
-        val buttonB = JButton("B")
-        val listenerA = mockk<ActionListener>(relaxed = true)
-        val listenerB = mockk<ActionListener>(relaxed = true)
-
-        buttonA.addActionListener(listenerA)
-        buttonB.addActionListener(listenerB)
-        panel.add(buttonA)
-        panel.add(buttonB)
-
-        panel.clickChild<JButton>(text = "A")
-
-        verify { listenerA.actionPerformed(any()) }
-        verifyNotCalled { listenerB.actionPerformed(any()) }
     }
 }
