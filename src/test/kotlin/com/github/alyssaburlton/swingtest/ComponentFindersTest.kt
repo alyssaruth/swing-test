@@ -241,7 +241,6 @@ class ComponentFindersTest {
         panel.add(JRadioButton("A"))
 
         panel.findChild<JButton>().shouldBeNull()
-        panel.getChild<JButton>()
 
         val e = shouldThrow<NoSuchComponentException> {
             panel.getChild<JButton>()
