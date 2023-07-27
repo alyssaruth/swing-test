@@ -11,8 +11,34 @@ import javax.swing.AbstractButton
  * @param W: The class of window to find
  * @param predicate: A predicate to match against the window
  */
-inline fun <reified W : Window> findWindow(predicate: (window: W) -> Boolean = { true }): W? =
-    Window.getWindows().find { it is W && predicate(it) } as? W
+inline fun <reified W : Window> findWindow(noinline predicate: (window: W) -> Boolean = { true }): W? =
+    findWindow(W::class.java, predicate)
+
+/**
+ * Finds a window of a given type, optionally matching a predicate.
+ * Non reified version for calling from Java.
+ *
+ * @param clazz: The class of window to find
+ * @param predicate: A predicate to match against the window
+ */
+@Suppress("UNCHECKED_CAST")
+@JvmOverloads
+fun <W : Window> findWindow(clazz: Class<W>, predicate: (window: W) -> Boolean = { true }): W? {
+    val filtered = Window.getWindows().filter { clazz.isInstance(it) && predicate(it as W) } as List<W>
+
+    if (filtered.size > 1) {
+        val trees = filtered.joinToString("------\n") { it.generateComponentTree() }
+
+        throw MultipleWindowsException(
+            "Found ${filtered.size} ${clazz.simpleName}s, expected 1 or 0:\n\n$trees"
+        )
+    }
+
+    return filtered.firstOrNull()
+}
+
+class MultipleWindowsException(message: String) : Exception(message)
+
 
 /**
  * Finds all child components of a given type, recursing through child containers.
@@ -47,8 +73,10 @@ private fun <T> addComponents(ret: MutableList<T>, components: Array<Component>,
     }
 }
 
-class MultipleComponentsException(override val message: String) : Exception(message)
-class NoSuchComponentException(override val message: String) : Exception(message)
+class MultipleComponentsException(container: Container, message: String) :
+    Exception("$message. \n\nComponent tree:\n\n${container.generateComponentTree()}")
+class NoSuchComponentException(container: Container, message: String) :
+    Exception("$message. \n\nComponent tree:\n\n${container.generateComponentTree()}")
 
 /**
  * Find a single child component, recursing through child containers.
@@ -97,7 +125,10 @@ fun <T : Component> Container.findChild(
     filterFn?.let { filtered = filtered.filter { filterFn(it) } }
 
     if (filtered.size > 1) {
-        throw MultipleComponentsException("Found ${filtered.size} ${clazz.simpleName}s, expected 1 or 0. name [$name], Text [$text]")
+        throw MultipleComponentsException(
+            this,
+            "Found ${filtered.size} ${clazz.simpleName}s, expected 1 or 0. name [$name], Text [$text]"
+        )
     }
 
     return filtered.firstOrNull()
@@ -159,7 +190,7 @@ fun <T : Component> Container.getChild(
     text: String? = null,
     filterFn: ((T) -> Boolean)? = null,
 ): T = findChild(clazz, name, text, filterFn)
-    ?: throw NoSuchComponentException("Found 0 ${clazz.simpleName}s. Text [$text], name [$name]")
+    ?: throw NoSuchComponentException(this, "Found 0 ${clazz.simpleName}s. Text [$text], name [$name]")
 
 /**
  * Simulate a click on a child component, recursing through child containers.

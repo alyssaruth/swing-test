@@ -2,7 +2,9 @@ package com.github.alyssaburlton.swingtest
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.awt.BorderLayout
+import java.io.File
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JDialog
@@ -15,10 +17,12 @@ import javax.swing.JTable
 import javax.swing.SwingUtilities
 import javax.swing.table.DefaultTableModel
 
-class DebuggingTest {
+@ExtendWith(SwingTestCleanupExtension::class)
+class SwingDebugTest {
     @Test
     fun `Should be able to dump a simple component tree`() {
         val frame = JFrame()
+        frame.name = "MyFrame"
         frame.title = "A Window"
         val panel = JPanel()
         frame.contentPane = panel
@@ -52,7 +56,7 @@ class DebuggingTest {
 
         val tree = frame.generateComponentTree()
         tree shouldBe """
-            JFrame - "A Window" - BorderLayout [name: frame0]
+            JFrame - "A Window" - BorderLayout [name: MyFrame]
             |- [Center] JRootPane - RootLayout
               |- JPanel - FlowLayout [name: null.glassPane]
               |- JLayeredPane - null [name: null.layeredPane]
@@ -75,12 +79,53 @@ class DebuggingTest {
     @Test
     fun `Should be able to dump a useful component tree for a file selector`() {
         val panel = JPanel()
-        val chooser = JFileChooser()
+        val directory = File("/")
+        val chooser = JFileChooser(directory)
         SwingUtilities.invokeLater { chooser.showOpenDialog(panel) }
         flushEdt()
 
         val window = findWindow<JDialog> { it.title == "Open" }!!
         val tree = window.generateComponentTree()
-        println(tree)
+        tree shouldBe """
+            JDialog - "Open" - BorderLayout [name: dialog0]
+            |- [Center] JRootPane - RootLayout
+              |- JPanel - FlowLayout [name: null.glassPane]
+              |- JLayeredPane - null [name: null.layeredPane]
+                |- JPanel - BorderLayout [name: null.contentPane]
+                  |- [Center] JFileChooser - BorderLayout
+                    |- [North] JPanel - BorderLayout
+                      |- [After] JPanel - BoxLayout
+                        |- JButton - "null" (ToolTip: "Up One Level")
+                        |- Filler - null
+                        |- JButton - "" (ToolTip: "Home")
+                        |- Filler - null
+                        |- JButton - "null" (ToolTip: "Create New Folder")
+                        |- Filler - null
+                        |- JToggleButton - "" (ToolTip: "List")
+                        |- JToggleButton - "" (ToolTip: "Details")
+                      |- [Before] JLabel - "Look In:"
+                      |- [Center]  JComboBox<File> - 1 items (Selected: /)
+                    |- [After] JPanel - BorderLayout
+                    |- [Center] FilePane - BorderLayout
+                      |- [Center] JPanel - BorderLayout
+                        |- [Center] JScrollPane - UIResource
+                          |- JViewport - ViewportLayout
+                            |- sun.swing.FilePane${'$'}4 - null
+                              |- CellRendererPane - null
+                          |- ScrollBar - VERTICAL
+                          |- ScrollBar - HORIZONTAL
+                    |- [South] JPanel - BoxLayout
+                      |- JPanel - BoxLayout
+                        |- AlignedLabel - "File Name:"
+                        |- javax.swing.plaf.metal.MetalFileChooserUI${'$'}3 - UpdateHandler
+                      |- Filler - null
+                      |- JPanel - BoxLayout
+                        |- AlignedLabel - "Files of Type:"
+                        |- JComboBox<AcceptAllFileFilter> - 1 items (Selected: javax.swing.plaf.basic.BasicFileChooserUI${'$'}AcceptAllFileFilter)
+                      |- JPanel - ButtonAreaLayout
+                        |- JButton - "Open" (ToolTip: "Open selected file")
+                        |- JButton - "Cancel" (ToolTip: "Abort file chooser dialog")
+
+        """.trimIndent()
     }
 }

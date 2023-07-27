@@ -48,7 +48,7 @@ private fun Component.oneLineDescription(): String {
         is JComboBox<*> -> {
             val item = if (itemCount > 0) getItemAt(0) else null
             val itemType = item?.describeClass() ?: "*"
-            val selection = selectedItem?.toString()
+            val selection = selectedItem?.toStringIgnoreInstance()
             "JComboBox<$itemType> - $itemCount items (Selected: $selection)"
         }
         is JScrollBar -> {
@@ -73,6 +73,8 @@ private fun Component.oneLineDescription(): String {
         desc
     }
 }
+
+private fun Any.toStringIgnoreInstance() = toString().replace(Regex("@[0-9a-fA-F]+"), "")
 
 private fun Any.describeClass() = javaClass.simpleName.ifEmpty { javaClass.name }
 
