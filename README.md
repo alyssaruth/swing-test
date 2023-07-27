@@ -48,7 +48,7 @@ val table = myContainer.getChild<JTable>()
 table.simulateKeyPress(KeyEvent.VK_ENTER) //Simulate the enter key being pressed
 ```
 
-Easy debugging with component Trees :tree:
+Easy debugging with component trees :tree:
 ------------------------------------------
 
 Many failing assertions will provide a useful error message that includes the component tree, for example:
