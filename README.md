@@ -36,7 +36,7 @@ myContainer.getChild<JLabel>(name = "AvatarLabel").shouldBeVisible()
 myContainer.clickChild<JRadioButton> { it.text.contains("foo") }
 ```
 
-Simulate common interactions once you have a reference to the component you're after:
+Simulate common interactions once you have a reference to the component you're after. All interactions executed with swing-test are run on the EDT, helping to avoid any issues with thread safety. 
 
 ```kotlin
 val label = myContainer.getChild<JLabel>()
@@ -48,7 +48,7 @@ val table = myContainer.getChild<JTable>()
 table.simulateKeyPress(KeyEvent.VK_ENTER) //Simulate the enter key being pressed
 ```
 
-Easy debugging with component trees :evergreen_tree:
+Quality debugging with component trees :evergreen_tree:
 ----------------------------------------------------
 
 Many failing assertions will provide a useful error message that includes the component tree, for example:
@@ -63,6 +63,29 @@ JPanel - FlowLayout
 ```
 
 These can also be generated manually via the extension method `Container.generateComponentTree()`
+
+Testing windows and modals
+--------------------------
+
+swing-test provides a `findWindow()` helper to locate windows and dialogs. This is done using Java AWT's static `Window.getWindows()` method, which tracks all Windows from the moment they are created.
+
+To avoid issues with shared state between tests, it is recommended to use the provided `SwingTestCleanupExtension` to ensure this is properly stamped on between tests. This can be done either by using the `@ExtendWith` JUnit annotation, or by calling the `purgeWindows()` method directly. A simple example of this can be seen below:
+
+```kotlin
+@ExtendWith(SwingTestCleanupExtension::class)
+class MyClassTest { 
+    @Test
+    fun `Finding a window launched by another component`() {
+        val myComponent = MyComponent()
+        myComponent.clickChild<JButton>(text = "Launch Window")
+        val window = findWindow<JFrame> { it.title == "My Window" }
+        window.shouldBeVisible()
+    }
+}
+```
+
+Windows in Java Swing also have the concept of being `modal`, meaning they block the thread that launched them until they are closed. To avoid blocking your tests, an `async` parameter exists on all component interactions. This will do the interaction in an `invokeLater()` before flushing the EDT, allowing your test to continue unimpeded whilst still guaranteeing that the interaction has completed. A full demonstration of how this works can be found in the [ModalDialogTest example](src/test/kotlin/com/github/alyssaburlton/swingtest/ModalDialogTest.kt)
+
 
 Snapshot Testing :camera_flash:
 -------------------------------
