@@ -4,12 +4,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
         with:
           java-version: 11
           distribution: zulu
       - name: Build with Gradle
-        uses: GabrielBB/xvfb-action@v1.6
-        with:
-          run: ./gradlew test --info
+        run: xvfb-run --auto-servernum ./gradlew test --info

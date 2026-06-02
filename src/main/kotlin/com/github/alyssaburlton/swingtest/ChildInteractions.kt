@@ -2,11 +2,12 @@ package com.github.alyssaburlton.swingtest
 
 import java.awt.Container
 import javax.swing.AbstractButton
+import javax.swing.JButton
 
-fun Container.clickOk(async: Boolean = false) = clickCommonButton("ok", async)
-fun Container.clickCancel(async: Boolean = false) = clickCommonButton("cancel", async)
-fun Container.clickYes(async: Boolean = false) = clickCommonButton("yes", async)
-fun Container.clickNo(async: Boolean = false) = clickCommonButton("no", async)
+fun Container.clickOk(async: Boolean = true) = clickCommonButton("ok", async)
+fun Container.clickCancel(async: Boolean = true) = clickCommonButton("cancel", async)
+fun Container.clickYes(async: Boolean = true) = clickCommonButton("yes", async)
+fun Container.clickNo(async: Boolean = true) = clickCommonButton("no", async)
 
 private fun Container.clickCommonButton(text: String, async: Boolean) =
     clickChild<AbstractButton>(async = async) {
@@ -29,7 +30,7 @@ private fun Container.clickCommonButton(text: String, async: Boolean) =
 inline fun <reified T : AbstractButton> Container.clickChild(
     name: String? = null,
     text: String? = null,
-    async: Boolean = false,
+    async: Boolean = true,
     noinline filterFn: ((T) -> Boolean)? = null,
 ) {
     clickChild(T::class.java, name, text, async, filterFn)
@@ -54,8 +55,20 @@ fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    async: Boolean = false,
+    async: Boolean = true,
     filterFn: ((T) -> Boolean)? = null,
 ) = maybeAsync(async) {
     getChild(clazz, name, text, filterFn).doClick()
+}
+
+/**
+ * Specific overload for buttons
+ */
+fun Container.clickButton(
+    name: String? = null,
+    text: String? = null,
+    async: Boolean = false,
+    filterFn: ((JButton) -> Boolean)? = null,
+) {
+    clickChild<JButton>(name, text, async, filterFn)
 }

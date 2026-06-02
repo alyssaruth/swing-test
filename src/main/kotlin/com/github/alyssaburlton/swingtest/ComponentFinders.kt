@@ -1,5 +1,6 @@
 package com.github.alyssaburlton.swingtest
 
+import io.kotest.matchers.shouldNotBe
 import java.awt.Component
 import java.awt.Container
 import java.awt.Window
@@ -34,6 +35,28 @@ fun <W : Window> findWindow(clazz: Class<W>, predicate: (window: W) -> Boolean =
     }
 
     return filtered.firstOrNull()
+}
+
+inline fun <reified W : Window> waitForWindow(
+    noinline predicate: (window: W) -> Boolean = { true }
+): W {
+    waitForAssertion { findWindow<W>(predicate) shouldNotBe null }
+    flushEdt()
+    return getWindow<W>(predicate)
+}
+
+inline fun <reified W : Window> getWindow(
+    noinline predicate: (window: W) -> Boolean = { true }
+): W {
+    val result = findWindow<W>(predicate)
+
+    if (result == null) {
+        val trees = Window.getWindows().joinToString("------\n") { it.generateComponentTree() }
+
+        throw Exception("Window not found for predicate. All windows:\n\n$trees")
+    }
+
+    return result
 }
 
 class MultipleWindowsException(message: String) : Exception(message)
