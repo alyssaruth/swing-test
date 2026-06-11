@@ -67,7 +67,7 @@ fun <T : AbstractButton> Container.clickChild(
 fun Container.clickButton(
     name: String? = null,
     text: String? = null,
-    async: Boolean = false,
+    async: Boolean = true,
     filterFn: ((JButton) -> Boolean)? = null,
 ) {
     clickChild<JButton>(name, text, async, filterFn)

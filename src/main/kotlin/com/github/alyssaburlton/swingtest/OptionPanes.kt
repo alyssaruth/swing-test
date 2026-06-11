@@ -38,7 +38,14 @@ private fun getInfoDialog() = findInfoDialog()!!
 fun findInfoDialog(predicate: (window: JDialog) -> Boolean = { true }) =
     findOptionPaneDialog("Information", predicate)
 
-fun getQuestionDialog() = getOptionPaneDialog("Question")
+fun expectQuestionDialog(message: String, answer: String) {
+    val question = getQuestionDialog { it.isVisible }
+    question.getDialogMessage() shouldBe message
+
+    question.clickButton(text = answer)
+}
+
+fun getQuestionDialog(predicate: (window: JDialog) -> Boolean = { true }) = getOptionPaneDialog("Question", predicate)
 
 fun findQuestionDialog() = findOptionPaneDialog("Question")
 
