@@ -4,8 +4,11 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.util.concurrent.CompletableFuture.runAsync
 import javax.swing.JOptionPane
 
+@ExtendWith(SwingTestCleanupExtension::class)
 class OptionPanesTest {
     @Test
     fun `expectQuestionDialog should fail if message isn't expected`() {
@@ -21,11 +24,21 @@ class OptionPanesTest {
 
     @Test
     fun `getQuestionDialog should fail if no dialog present`() {
-        val error = shouldThrow<Exception> {
-            getQuestionDialog()
+        val error = shouldThrow<AssertionError> {
+            expectQuestionDialog("Anything", "No")
         }
 
         error.message.shouldContain("Window not found for predicate.")
+    }
+
+    @Test
+    fun `waitForQuestionDialog should time out if no dialog present`() {
+        val error = shouldThrow<AssertionError> {
+            waitForQuestionDialog("Anything", "No", timeout = 2000)
+        }
+
+        error.message.shouldContain("Timed out waiting for assertion")
+        error.cause!!.message.shouldContain("Window not found for predicate.")
     }
 
     @Test
@@ -36,7 +49,7 @@ class OptionPanesTest {
         expectQuestionDialog("Would you like a cup of tea?", "Yes")
         panel.result shouldBe JOptionPane.YES_OPTION
 
-        val error = shouldThrow<Exception> { expectQuestionDialog("Would you like a cup of tea?", "Yes") }
+        val error = shouldThrow<AssertionError> { expectQuestionDialog("Would you like a cup of tea?", "Yes") }
         error.message.shouldContain("Window not found for predicate.")
     }
 
@@ -48,13 +61,27 @@ class OptionPanesTest {
         val error = shouldThrow<Exception> {
             expectQuestionDialog("Would you like a cup of tea?", "Not sure")
         }
-        error.message.shouldContain("Window not found for predicate.")
+        error.message.shouldContain("Found 0 JButtons")
     }
 
     @Test
-    fun `finders return null if none found`() {
-        findQuestionDialog() shouldBe null
-        findErrorDialog() shouldBe null
-        findInfoDialog() shouldBe null
+    fun `waitForQuestionDialog works`() {
+        val panel = OptionPaneLauncher()
+        runAsync {
+            Thread.sleep(1000)
+            panel.clickButton(text = "Question", async = false)
+        }
+
+        shouldThrow<AssertionError> {
+            expectQuestionDialog("Would you like a cup of tea?", "No")
+        }
+
+        waitForQuestionDialog("Would you like a cup of tea?", "No")
+        panel.result shouldBe JOptionPane.NO_OPTION
+    }
+
+    @Test
+    fun `findOptionPaneDialog returns null if none found`() {
+        findOptionPaneDialog("Question") shouldBe null
     }
 }

@@ -6,7 +6,7 @@ import javax.swing.JButton
 import javax.swing.JOptionPane
 import javax.swing.JPanel
 
-class OptionPaneLauncher(private val delayMs: Long? = null): JPanel(), ActionListener {
+class OptionPaneLauncher(): JPanel(), ActionListener {
     private val btnQuestion = JButton("Question")
     private val btnInfo = JButton("Info")
     private val btnError = JButton("Error")
@@ -31,8 +31,6 @@ class OptionPaneLauncher(private val delayMs: Long? = null): JPanel(), ActionLis
     }
 
     override fun actionPerformed(e: ActionEvent) {
-        delayMs?.let { Thread.sleep(delayMs) }
-
         when (e.source) {
             btnQuestion -> launchQuestion()
         }

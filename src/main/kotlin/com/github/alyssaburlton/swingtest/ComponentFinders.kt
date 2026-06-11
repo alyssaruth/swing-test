@@ -53,7 +53,7 @@ inline fun <reified W : Window> getWindow(
     if (result == null) {
         val trees = Window.getWindows().joinToString("------\n") { it.generateComponentTree() }
 
-        throw Exception("Window not found for predicate. All windows:\n\n$trees")
+        throw AssertionError("Window not found for predicate. All windows:\n\n$trees")
     }
 
     return result

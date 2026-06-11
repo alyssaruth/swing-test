@@ -57,8 +57,11 @@ fun <T : AbstractButton> Container.clickChild(
     text: String? = null,
     async: Boolean = true,
     filterFn: ((T) -> Boolean)? = null,
-) = maybeAsync(async) {
-    getChild(clazz, name, text, filterFn).doClick()
+) {
+    val child = getChild(clazz, name, text, filterFn)
+    maybeAsync(async) {
+        child.doClick()
+    }
 }
 
 /**

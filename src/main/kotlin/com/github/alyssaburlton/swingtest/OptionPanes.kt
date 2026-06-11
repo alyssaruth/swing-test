@@ -8,6 +8,23 @@ import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.text.JTextComponent
 
+/**
+ * Question
+ */
+fun waitForQuestionDialog(message: String, answer: String, title: String = "Question", timeout: Int = 5000) {
+    waitForOptionPaneDialog(title, timeout = timeout)
+
+    expectQuestionDialog(message, answer)
+}
+
+fun expectQuestionDialog(message: String, answer: String, title: String = "Question") {
+    val question = getOptionPaneDialog(title) { it.isVisible }
+    question.getDialogMessage() shouldBe message
+
+    question.clickButton(text = answer)
+}
+
+
 fun expectErrorDialog(message: String) {
     val error = getErrorDialog { it.isVisible }
     error.getDialogMessage() shouldBe message
@@ -38,24 +55,12 @@ private fun getInfoDialog() = findInfoDialog()!!
 fun findInfoDialog(predicate: (window: JDialog) -> Boolean = { true }) =
     findOptionPaneDialog("Information", predicate)
 
-fun expectQuestionDialog(message: String, answer: String) {
-    val question = getQuestionDialog { it.isVisible }
-    question.getDialogMessage() shouldBe message
-
-    question.clickButton(text = answer)
-}
-
-fun getQuestionDialog(predicate: (window: JDialog) -> Boolean = { true }) = getOptionPaneDialog("Question", predicate)
-
-fun findQuestionDialog() = findOptionPaneDialog("Question")
 
 fun getErrorDialog(predicate: (window: JDialog) -> Boolean = { true }) =
     getOptionPaneDialog("Error", predicate)
 
 fun findErrorDialog(predicate: (window: JDialog) -> Boolean = { true }) =
     findOptionPaneDialog("Error", predicate)
-
-fun waitForQuestionDialog(): JDialog = waitForWindow<JDialog> { it.title == "Question" }
 
 fun selectFromOptionDialog(title: String, selection: String) {
     val dialog = getOptionPaneDialog(title) { it.isVisible }
@@ -115,7 +120,11 @@ fun dismissDialog(title: String) {
 private fun getOptionPaneDialog(title: String, predicate: (window: JDialog) -> Boolean = { true }) =
     getWindow<JDialog> { it.title == title && predicate(it) }
 
-private fun findOptionPaneDialog(
+private fun waitForOptionPaneDialog(title: String, timeout: Int = 5000) {
+    waitForAssertion(timeout) { getOptionPaneDialog(title) { it.isVisible } }
+}
+
+fun findOptionPaneDialog(
     title: String,
     predicate: (window: JDialog) -> Boolean = { true },
 ) = findWindow<JDialog> { it.title == title && predicate(it) }
