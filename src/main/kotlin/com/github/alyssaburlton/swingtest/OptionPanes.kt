@@ -14,53 +14,44 @@ import javax.swing.text.JTextComponent
 fun waitForQuestionDialog(message: String, answer: String, title: String = "Question", timeout: Int = 5000) {
     waitForOptionPaneDialog(title, timeout = timeout)
 
-    expectQuestionDialog(message, answer)
+    expectQuestionDialog(message, answer, title)
 }
 
 fun expectQuestionDialog(message: String, answer: String, title: String = "Question") {
-    val question = getOptionPaneDialog(title) { it.isVisible }
-    question.getDialogMessage() shouldBe message
-
-    question.clickButton(text = answer)
+    expectOptionPaneDialog(message, title, answer)
 }
 
+/**
+ * Error
+ */
+fun waitForErrorDialog(message: String, title: String = "Error", timeout: Int = 5000) {
+    waitForOptionPaneDialog(title, timeout = timeout)
 
-fun expectErrorDialog(message: String) {
-    val error = getErrorDialog { it.isVisible }
-    error.getDialogMessage() shouldBe message
-    error.clickOk(async = true)
+    expectErrorDialog(message, title)
 }
 
-fun waitForErrorDialog(message: String) {
-    waitForAssertion { findErrorDialog { it.isVisible } shouldNotBe null }
-
-    expectErrorDialog(message)
+fun expectErrorDialog(message: String, title: String = "Error") {
+    expectOptionPaneDialog(message, title, "OK")
 }
 
-fun expectInfoDialog(message: String) {
-    val info = getInfoDialog()
-    info.getDialogMessage() shouldBe message
-    info.clickOk(async = true)
-}
-
-fun waitForInfoDialog(message: String) {
-    waitForAssertion { findInfoDialog { it.isVisible } shouldNotBe null }
+/**
+ * Info
+ */
+fun waitForInfoDialog(message: String, title: String = "Information", timeout: Int = 5000) {
+    waitForOptionPaneDialog(title, timeout = timeout)
 
     expectInfoDialog(message)
 }
+fun expectInfoDialog(message: String, title: String = "Information") {
+    expectOptionPaneDialog(message, title, "OK")
+}
 
+private fun expectOptionPaneDialog(message: String, title: String, buttonText: String) {
+    val dlg = getOptionPaneDialog(title) { it.isVisible }
+    dlg.getDialogMessage() shouldBe message
+    dlg.clickButton(text = buttonText)
+}
 
-private fun getInfoDialog() = findInfoDialog()!!
-
-fun findInfoDialog(predicate: (window: JDialog) -> Boolean = { true }) =
-    findOptionPaneDialog("Information", predicate)
-
-
-fun getErrorDialog(predicate: (window: JDialog) -> Boolean = { true }) =
-    getOptionPaneDialog("Error", predicate)
-
-fun findErrorDialog(predicate: (window: JDialog) -> Boolean = { true }) =
-    findOptionPaneDialog("Error", predicate)
 
 fun selectFromOptionDialog(title: String, selection: String) {
     val dialog = getOptionPaneDialog(title) { it.isVisible }

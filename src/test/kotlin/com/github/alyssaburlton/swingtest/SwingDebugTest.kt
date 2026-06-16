@@ -85,6 +85,7 @@ class SwingDebugTest {
         flushEdt()
 
         val window = findWindow<JDialog> { it.title == "Open" }!!
+        window.name = "dialog0"
         val tree = window.generateComponentTree()
         tree shouldBe """
             JDialog - "Open" - BorderLayout [name: dialog0]
