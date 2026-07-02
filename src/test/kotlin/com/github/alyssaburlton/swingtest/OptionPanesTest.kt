@@ -3,7 +3,6 @@ package com.github.alyssaburlton.swingtest
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.util.concurrent.CompletableFuture.runAsync
@@ -178,7 +177,7 @@ class OptionPanesTest {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "TextInput")
 
-        typeIntoInputDialog("Input", "Here is some text")
+        typeIntoInputDialog("Here is some text")
 
         panel.result shouldBe "Here is some text"
 
@@ -200,7 +199,7 @@ class OptionPanesTest {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "ComboInput")
 
-        shouldThrow<NoSuchComponentException> { typeIntoInputDialog("Input", "Here is some text") }
+        shouldThrow<NoSuchComponentException> { typeIntoInputDialog("Here is some text", "Input") }
     }
 
     @Test
@@ -208,7 +207,7 @@ class OptionPanesTest {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "TextInput")
 
-        cancelOptionDialog("Input")
+        cancelDialog("Input")
 
         panel.result shouldBe null
         findOptionPaneDialog("Input")!!.shouldNotBeVisible()

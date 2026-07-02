@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldNotBe
 import java.awt.Component
 import java.awt.Container
 import java.awt.Window
+import javax.swing.JDialog
 
 /**
  * Finds a window of a given type, optionally matching a predicate.

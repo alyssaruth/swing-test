@@ -1,65 +1,65 @@
 package com.github.alyssaburlton.swingtest
 
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import javax.swing.JComboBox
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JList
+import javax.swing.JOptionPane
 import javax.swing.text.JTextComponent
 
 /**
  * Question
  */
-fun waitForQuestionDialog(message: String, answer: String, title: String = "Question", timeout: Int = 5000) {
-    waitForOptionPaneDialog(title, timeout = timeout)
+fun waitForQuestionDialog(message: String, answer: String, title: String? = null, timeout: Int = 5000) {
+    waitForOptionPaneDialog(JOptionPane.QUESTION_MESSAGE, title, timeout = timeout)
 
     expectQuestionDialog(message, answer, title)
 }
 
-fun expectQuestionDialog(message: String, answer: String, title: String = "Question") {
-    expectOptionPaneDialog(message, title, answer)
+fun expectQuestionDialog(message: String, answer: String, title: String? = null) {
+    expectOptionPaneDialog(JOptionPane.QUESTION_MESSAGE, message,  answer, title)
 }
 
 /**
  * Error
  */
 fun waitForErrorDialog(message: String, title: String = "Error", timeout: Int = 5000) {
-    waitForOptionPaneDialog(title, timeout = timeout)
+    waitForOptionPaneDialog(JOptionPane.ERROR_MESSAGE, title, timeout = timeout)
 
     expectErrorDialog(message, title)
 }
 
-fun expectErrorDialog(message: String, title: String = "Error") {
-    expectOptionPaneDialog(message, title, "OK")
+fun expectErrorDialog(message: String, title: String? = null) {
+    expectOptionPaneDialog(JOptionPane.ERROR_MESSAGE, message, "OK", title)
 }
 
 /**
  * Info
  */
-fun waitForInfoDialog(message: String, title: String = "Information", timeout: Int = 5000) {
-    waitForOptionPaneDialog(title, timeout = timeout)
+fun waitForInfoDialog(message: String, title: String? = null, timeout: Int = 5000) {
+    waitForOptionPaneDialog(JOptionPane.INFORMATION_MESSAGE, title, timeout = timeout)
 
     expectInfoDialog(message)
 }
-fun expectInfoDialog(message: String, title: String = "Information") {
-    expectOptionPaneDialog(message, title, "OK")
+fun expectInfoDialog(message: String, title: String? = null) {
+    expectOptionPaneDialog(JOptionPane.INFORMATION_MESSAGE, message, "OK", title)
 }
 
-private fun expectOptionPaneDialog(message: String, title: String, buttonText: String) {
-    val dlg = getOptionPaneDialog(title) { it.isVisible }
+private fun expectOptionPaneDialog(messageType: Int, message: String, buttonText: String, title: String? = null) {
+    val dlg = getOptionPaneDialog(messageType, title)
     dlg.getDialogMessage() shouldBe message
     dlg.clickButton(text = buttonText)
 }
 
 
-fun selectFromOptionDialog(title: String, selection: String) {
-    val dialog = getOptionPaneDialog(title) { it.isVisible }
+fun selectFromOptionDialog(selection: String, title: String? = null) {
+    val dialog = getOptionPaneDialog(JOptionPane.PLAIN_MESSAGE, title)
     dialog.clickButton(text = selection, async = true)
 }
 
-fun typeIntoInputDialog(title: String, text: String) {
-    val dlg = getOptionPaneDialog(title) { it.isVisible }
+fun typeIntoInputDialog(text: String, title: String? = null) {
+    val dlg = getOptionPaneDialog(JOptionPane.PLAIN_MESSAGE, title)
     dlg.getChild<JTextComponent>().typeText(text)
     dlg.clickOk(async = true)
 }
@@ -96,23 +96,11 @@ inline fun <reified E> JList<E>.items(): List<E> {
 
 fun <K> JComboBox<K>.items() = (0 until model.size).map { model.getElementAt(it) }
 
-fun cancelOptionDialog(title: String) {
-    val dialog = getOptionPaneDialog(title) { it.isVisible }
-    dialog.clickCancel(async = true)
-}
+private fun getOptionPaneDialog(type: Int, title: String? = null) =
+    getWindow<JDialog> { it.getChild<JOptionPane>().messageType == type && (title == null || it.title == title) && it.isVisible }
 
-fun dismissDialog(title: String) {
-    val dialog = getOptionPaneDialog(title) { it.isVisible }
-    dialog.dispose()
-    flushEdt()
-}
-
-
-private fun getOptionPaneDialog(title: String, predicate: (window: JDialog) -> Boolean = { true }) =
-    getWindow<JDialog> { it.title == title && predicate(it) }
-
-private fun waitForOptionPaneDialog(title: String, timeout: Int = 5000) {
-    waitForAssertion(timeout) { getOptionPaneDialog(title) { it.isVisible } }
+private fun waitForOptionPaneDialog(type: Int, title: String? = null, timeout: Int = 5000) {
+    waitForAssertion(timeout) { getOptionPaneDialog(type, title) }
 }
 
 fun findOptionPaneDialog(
@@ -128,4 +116,15 @@ fun JDialog.getDialogMessage(): String {
         )
     }
     return messageLabels.joinToString("\n\n") { it.text }
+}
+
+fun dismissDialog(title: String) {
+    val dialog = getWindow<JDialog> { it.title == title && it.isVisible }
+    dialog.dispose()
+    flushEdt()
+}
+
+fun cancelDialog(title: String) {
+    val dialog = getWindow<JDialog> { it.title == title && it.isVisible }
+    dialog.clickCancel(async = true)
 }

@@ -10,6 +10,7 @@ import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JScrollBar
 import javax.swing.JTable
 
@@ -59,6 +60,7 @@ private fun Component.oneLineDescription(): String {
             val columns = columnModel.columns.toList().map { it.headerValue }.joinToString()
             "$className - [$columns] - $rowCount rows"
         }
+        is JOptionPane -> "$className ($messageType) - ${layout?.describeClass()}"
         is JComponent -> {
             val toolTipDesc = toolTipText?.let { """ - "$it"""" } ?: ""
             """$className$toolTipDesc - ${layout?.describeClass()}"""
