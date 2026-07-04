@@ -44,8 +44,8 @@ fun Component.oneLineDescription(): String {
             """$className - "$text"$tooltipInfo"""
         }
         is JLabel -> """$className - "$text""""
-        is JFrame -> """$className - "$title" - ${layout?.describeClass()} (visible: $isVisible)"""
-        is JDialog -> """$className - "$title" - ${layout?.describeClass()} (visible: $isVisible)"""
+        is JFrame -> """$className - "$title" - ${layout?.describeClass()}"""
+        is JDialog -> """$className - "$title" - ${layout?.describeClass()}"""
         is JComboBox<*> -> {
             val item = if (itemCount > 0) getItemAt(0) else null
             val itemType = item?.describeClass() ?: "*"
@@ -69,10 +69,12 @@ fun Component.oneLineDescription(): String {
         else -> className
     }
 
+    val visibleDesc = if (isVisible) { "\uD83D\uDC41 $desc" } else desc
+
     return if (name != null) {
-        "$desc [name: $name]"
+        "$visibleDesc [name: $name]"
     } else {
-        desc
+        visibleDesc
     }
 }
 
