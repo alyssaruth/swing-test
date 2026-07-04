@@ -167,7 +167,7 @@ private fun <T : Component> filterByText(
     val getter = clazz.getMethod("getText")
     return components.filter {
         val result = getter.invoke(it)
-        "$result" == match
+        "$result".equals(match, ignoreCase = true)
     }
 }
 

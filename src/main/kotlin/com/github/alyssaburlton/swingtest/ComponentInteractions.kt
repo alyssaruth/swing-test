@@ -8,8 +8,12 @@ import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import javax.swing.text.JTextComponent
 
+fun runAsync(interaction: () -> Unit) = maybeAsync(true, interaction)
+
 fun maybeAsync(async: Boolean, interaction: () -> Unit) {
-    if (async) {
+    if (SwingUtilities.isEventDispatchThread()) {
+        interaction()
+    } else if (async) {
         SwingUtilities.invokeLater(interaction)
         flushEdt()
     } else {

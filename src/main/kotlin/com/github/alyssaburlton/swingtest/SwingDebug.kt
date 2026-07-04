@@ -35,7 +35,7 @@ private fun Container.generateComponentTree(prefix: String, constraintDesc: Stri
 }
 
 private fun Component.isBoringContainer() = this is JScrollBar || this is JTable || this is JComboBox<*>
-private fun Component.oneLineDescription(): String {
+fun Component.oneLineDescription(): String {
     val className = describeClass()
 
     val desc = when (this) {
@@ -44,8 +44,8 @@ private fun Component.oneLineDescription(): String {
             """$className - "$text"$tooltipInfo"""
         }
         is JLabel -> """$className - "$text""""
-        is JFrame -> """$className - "$title" - ${layout?.describeClass()}"""
-        is JDialog -> """$className - "$title" - ${layout?.describeClass()}"""
+        is JFrame -> """$className - "$title" - ${layout?.describeClass()} (visible: $isVisible)"""
+        is JDialog -> """$className - "$title" - ${layout?.describeClass()} (visible: $isVisible)"""
         is JComboBox<*> -> {
             val item = if (itemCount > 0) getItemAt(0) else null
             val itemType = item?.describeClass() ?: "*"

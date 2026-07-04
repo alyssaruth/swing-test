@@ -10,9 +10,7 @@ fun Container.clickYes(async: Boolean = true) = clickCommonButton("yes", async)
 fun Container.clickNo(async: Boolean = true) = clickCommonButton("no", async)
 
 private fun Container.clickCommonButton(text: String, async: Boolean) =
-    clickChild<AbstractButton>(async = async) {
-        it.text.equals(text, ignoreCase = true)
-    }
+    clickChild<AbstractButton>(async = async, text = text)
 
 /**
  * Simulate a click on a child component, recursing through child containers.

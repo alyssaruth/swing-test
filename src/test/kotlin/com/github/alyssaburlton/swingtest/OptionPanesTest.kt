@@ -5,8 +5,9 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import java.util.concurrent.CompletableFuture.runAsync
+import javax.swing.JDialog
 import javax.swing.JOptionPane
+import javax.swing.SwingUtilities
 
 @ExtendWith(SwingTestCleanupExtension::class)
 class OptionPanesTest {
@@ -54,6 +55,15 @@ class OptionPanesTest {
     }
 
     @Test
+    fun `expectQuestionDialog works for custom options`() {
+        val panel = OptionPaneLauncher()
+        panel.clickButton(text = "Custom Question")
+
+        expectQuestionDialog("What would you like to drink?", "Coffee")
+        panel.result shouldBe TEST_OPTIONS.indexOf("Coffee")
+    }
+
+    @Test
     fun `expectQuestionDialog fails for invalid answer`() {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "Question")
@@ -67,7 +77,7 @@ class OptionPanesTest {
     @Test
     fun `waitForQuestionDialog works`() {
         val panel = OptionPaneLauncher()
-        runAsync {
+        SwingUtilities.invokeLater {
             Thread.sleep(1000)
             panel.clickButton(text = "Question", async = false)
         }
@@ -93,7 +103,7 @@ class OptionPanesTest {
     }
 
     @Test
-    fun `expectErrorDialog fails if dialog title is wrong`() {
+    fun `expectErrorDialog fails if dialog messageType is wrong`() {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "Question")
 
@@ -113,7 +123,7 @@ class OptionPanesTest {
     @Test
     fun `waitForErrorDialog works`() {
         val panel = OptionPaneLauncher()
-        runAsync {
+        SwingUtilities.invokeLater {
             Thread.sleep(1000)
             panel.clickButton(text = "Error", async = false)
         }
@@ -139,7 +149,7 @@ class OptionPanesTest {
     }
 
     @Test
-    fun `expectInfoDialog fails if dialog title is wrong`() {
+    fun `expectInfoDialog fails if dialog messageType is wrong`() {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "Question")
 
@@ -159,7 +169,7 @@ class OptionPanesTest {
     @Test
     fun `waitForInfoDialog works`() {
         val panel = OptionPaneLauncher()
-        runAsync {
+        SwingUtilities.invokeLater {
             Thread.sleep(1000)
             panel.clickButton(text = "Info", async = false)
         }
@@ -177,12 +187,12 @@ class OptionPanesTest {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "TextInput")
 
-        typeIntoInputDialog("Here is some text")
+        typeIntoInputDialog("Enter some text", "Here is some text")
 
         panel.result shouldBe "Here is some text"
 
-        val error = shouldThrow<AssertionError> { typeIntoInputDialog("Input", "Here is some text") }
-        error.message.shouldContain("Window not found for predicate.")
+        val error = shouldThrow<AssertionError> { typeIntoInputDialog("Enter some text", "Here is some text") }
+        error.cause!!.message.shouldContain("Window not found for predicate.")
     }
 
     @Test
@@ -190,8 +200,8 @@ class OptionPanesTest {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "TextInput")
 
-        val error = shouldThrow<AssertionError> { typeIntoInputDialog("Wrong title", "Here is some text") }
-        error.message.shouldContain("Window not found for predicate.")
+        val error = shouldThrow<AssertionError> { typeIntoInputDialog("Enter some text", "Here is some text", title = "Wrong title") }
+        error.cause!!.message.shouldContain("Window not found for predicate.")
     }
 
     @Test
@@ -199,7 +209,7 @@ class OptionPanesTest {
         val panel = OptionPaneLauncher()
         panel.clickButton(text = "ComboInput")
 
-        shouldThrow<NoSuchComponentException> { typeIntoInputDialog("Here is some text", "Input") }
+        shouldThrow<NoSuchComponentException> { typeIntoInputDialog("Favourite Square?", "Here is some text") }
     }
 
     @Test
@@ -210,7 +220,7 @@ class OptionPanesTest {
         cancelDialog("Input")
 
         panel.result shouldBe null
-        findOptionPaneDialog("Input")!!.shouldNotBeVisible()
+        findWindow<JDialog> { it.title == "Input" }!!.shouldNotBeVisible()
     }
 
     @Test
@@ -221,11 +231,70 @@ class OptionPanesTest {
         dismissDialog("Input")
 
         panel.result shouldBe null
-        findOptionPaneDialog("Input")!!.shouldNotBeVisible()
+        findWindow<JDialog> { it.title == "Input" }!!.shouldNotBeVisible()
     }
 
     @Test
-    fun `findOptionPaneDialog returns null if none found`() {
-        findOptionPaneDialog("Question") shouldBe null
+    fun `selectOptionFromInputDialog should work for a combo box`() {
+        val panel = OptionPaneLauncher()
+        panel.clickButton(text = "ComboInput")
+
+        selectOptionFromInputDialog("Favourite Square?", 25)
+        panel.result shouldBe 25
+
+        shouldThrow<AssertionError> { selectOptionFromInputDialog("Favourite Square?", 25) }
+    }
+
+    @Test
+    fun `selectOptionFromInputDialog should throw assertion error if option not found in combo`() {
+        val panel = OptionPaneLauncher()
+        panel.clickButton(text = "ComboInput")
+
+        val err = shouldThrow<AssertionError> { selectOptionFromInputDialog("Favourite Square?", 26) }
+        err.message shouldBe "Input dialog did not contain desired combo option 26. Options: [1, 4, 9, 16, 25, 36, 49, 64]"
+    }
+
+    @Test
+    fun `selectOptionFromInputDialog should work for a list`() {
+        val panel = OptionPaneLauncher()
+        panel.clickButton(text = "ListInput")
+
+        selectOptionFromInputDialog("Pick a number", 56)
+        panel.result shouldBe 56
+
+        shouldThrow<AssertionError> { selectOptionFromInputDialog("Pick a number", 25) }
+    }
+
+    @Test
+    fun `selectOptionFromInputDialog should throw assertion error if option not found in list`() {
+        val panel = OptionPaneLauncher()
+        panel.clickButton(text = "ListInput")
+
+        val err = shouldThrow<AssertionError> { selectOptionFromInputDialog("Pick a number", 101) }
+        err.message shouldBe "Input dialog did not contain desired list option 101. Options: ${(1..100).toList()}"
+    }
+
+    @Test
+    fun `gets correct dialog message for a long multi-line message`() {
+        val message = """This is a big long message.
+            With multiple new lines.
+            
+            And spaces between some lines.
+            
+            And Swing does silly things when rendering them.
+        """.trimMargin()
+
+        runAsync {
+            JOptionPane.showMessageDialog(
+                null,
+                message,
+                "Information",
+                JOptionPane.INFORMATION_MESSAGE,
+            )
+        }
+
+        val dlg = getOptionPaneDialog(JOptionPane.INFORMATION_MESSAGE)
+        dlg.getDialogMessage() shouldBe message
+        dlg.dispose()
     }
 }
