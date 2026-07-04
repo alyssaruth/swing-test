@@ -4,13 +4,10 @@ import java.awt.Container
 import javax.swing.AbstractButton
 import javax.swing.JButton
 
-const val ASYNC_BY_DEFAULT_PROP = "asyncInteractionByDefault"
-fun asyncDefault() = System.getProperty(ASYNC_BY_DEFAULT_PROP)?.toBoolean() ?: true
-
-fun Container.clickOk(async: Boolean = asyncDefault()) = clickCommonButton("ok", async)
-fun Container.clickCancel(async: Boolean = asyncDefault()) = clickCommonButton("cancel", async)
-fun Container.clickYes(async: Boolean = asyncDefault()) = clickCommonButton("yes", async)
-fun Container.clickNo(async: Boolean = asyncDefault()) = clickCommonButton("no", async)
+fun Container.clickOk(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("ok", async)
+fun Container.clickCancel(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("cancel", async)
+fun Container.clickYes(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("yes", async)
+fun Container.clickNo(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("no", async)
 
 private fun Container.clickCommonButton(text: String, async: Boolean) =
     clickChild<AbstractButton>(async = async, text = text)
@@ -31,7 +28,7 @@ private fun Container.clickCommonButton(text: String, async: Boolean) =
 inline fun <reified T : AbstractButton> Container.clickChild(
     name: String? = null,
     text: String? = null,
-    async: Boolean = asyncDefault(),
+    async: Boolean = ASYNC_BY_DEFAULT,
     noinline filterFn: ((T) -> Boolean)? = null,
 ) {
     clickChild(T::class.java, name, text, async, filterFn)
@@ -56,7 +53,7 @@ fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    async: Boolean = asyncDefault(),
+    async: Boolean = ASYNC_BY_DEFAULT,
     filterFn: ((T) -> Boolean)? = null,
 ) {
     val child = getChild(clazz, name, text, filterFn)
@@ -71,7 +68,7 @@ fun <T : AbstractButton> Container.clickChild(
 fun Container.clickButton(
     name: String? = null,
     text: String? = null,
-    async: Boolean = asyncDefault(),
+    async: Boolean = ASYNC_BY_DEFAULT,
     filterFn: ((JButton) -> Boolean)? = null,
 ) {
     clickChild<JButton>(name, text, async, filterFn)

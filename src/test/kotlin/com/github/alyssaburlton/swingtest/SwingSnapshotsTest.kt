@@ -28,8 +28,8 @@ class SwingSnapshotsTest {
 
     @BeforeEach
     fun before() {
-        System.clearProperty(ENV_SCREENSHOT_OS)
-        System.clearProperty(ENV_UPDATE_SNAPSHOT)
+        System.clearProperty(SCREENSHOT_OS_PROP)
+        System.clearProperty(UPDATE_SNAPSHOT_PROP)
         File(resourceLocation).deleteRecursively()
     }
 
@@ -52,7 +52,7 @@ class SwingSnapshotsTest {
 
     @Test
     fun `Should pass and write new snapshot if in updateSnapshots mode`() {
-        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(UPDATE_SNAPSHOT_PROP, "true")
 
         val label = makeComponent()
 
@@ -65,8 +65,8 @@ class SwingSnapshotsTest {
 
     @Test
     fun `Should skip the test if on the wrong OS`() {
-        System.setProperty(ENV_SCREENSHOT_OS, "invalid")
-        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(SCREENSHOT_OS_PROP, "invalid")
+        System.setProperty(UPDATE_SNAPSHOT_PROP, "true")
 
         val label = makeComponent()
 
@@ -80,8 +80,8 @@ class SwingSnapshotsTest {
 
     @Test
     fun `Should not skip the test if OS matches`() {
-        System.setProperty(ENV_SCREENSHOT_OS, os)
-        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(SCREENSHOT_OS_PROP, os)
+        System.setProperty(UPDATE_SNAPSHOT_PROP, "true")
 
         val label = makeComponent()
 
@@ -233,9 +233,9 @@ class SwingSnapshotsTest {
     }
 
     private fun JComponent.createImageFile(filename: String) {
-        System.setProperty(ENV_UPDATE_SNAPSHOT, "true")
+        System.setProperty(UPDATE_SNAPSHOT_PROP, "true")
         shouldMatchImage(filename)
-        System.clearProperty(ENV_UPDATE_SNAPSHOT)
+        System.clearProperty(UPDATE_SNAPSHOT_PROP)
     }
 
     private fun makeComponent(text: String = "Label A") = JLabel(text).also { it.size = Dimension(200, 40) }
