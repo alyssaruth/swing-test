@@ -5,7 +5,9 @@ import io.mockk.MockKMatcherScope
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import java.awt.Component
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -22,8 +24,15 @@ import javax.swing.JLabel
 import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 
+@ExtendWith(SwingTestCleanupExtension::class)
 class ComponentInteractionsTest {
+    @AfterEach
+    fun afterEach() {
+        System.clearProperty(ASYNC_BY_DEFAULT_PROP)
+    }
+
     @Test
     fun `doClick should call mouseClicked and mouseReleased in order, on all listeners`() {
         val listenerOne = mockk<MouseListener>(relaxed = true)
@@ -201,6 +210,58 @@ class ComponentInteractionsTest {
         val textField = JTextField()
         textField.typeText("Hello, World!")
         textField.text shouldBe "Hello, World!"
+    }
+
+    @Test
+    fun `Should interact asynchronously by default`() {
+        val pane = OptionPaneLauncher()
+
+        var blocked = true
+
+        val t = Thread {
+            pane.clickButton(text = "Info")
+            blocked = false
+        }
+
+        t.start()
+
+        Thread.sleep(500)
+        blocked shouldBe false
+    }
+
+    @Test
+    fun `Should interact synchronously if instructed`() {
+        val pane = OptionPaneLauncher()
+
+        var blocked = true
+
+        val t = Thread {
+            pane.clickButton(text = "Info", async = false)
+            blocked = false
+        }
+
+        t.start()
+
+        Thread.sleep(500)
+        blocked shouldBe true
+    }
+
+    @Test
+    fun `Should interact synchronously if defaulted via system property`() {
+        System.setProperty(ASYNC_BY_DEFAULT_PROP, "false")
+        val pane = OptionPaneLauncher()
+
+        var blocked = true
+
+        val t = Thread {
+            pane.clickButton(text = "Info")
+            blocked = false
+        }
+
+        t.start()
+
+        Thread.sleep(500)
+        blocked shouldBe true
     }
 
     private fun MockKMatcherScope.eventWithClickCount(count: Int) = match<MouseEvent> {

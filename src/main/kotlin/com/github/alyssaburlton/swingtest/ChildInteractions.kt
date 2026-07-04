@@ -4,10 +4,13 @@ import java.awt.Container
 import javax.swing.AbstractButton
 import javax.swing.JButton
 
-fun Container.clickOk(async: Boolean = true) = clickCommonButton("ok", async)
-fun Container.clickCancel(async: Boolean = true) = clickCommonButton("cancel", async)
-fun Container.clickYes(async: Boolean = true) = clickCommonButton("yes", async)
-fun Container.clickNo(async: Boolean = true) = clickCommonButton("no", async)
+const val ASYNC_BY_DEFAULT_PROP = "asyncInteractionByDefault"
+fun asyncDefault() = System.getProperty(ASYNC_BY_DEFAULT_PROP)?.toBoolean() ?: true
+
+fun Container.clickOk(async: Boolean = asyncDefault()) = clickCommonButton("ok", async)
+fun Container.clickCancel(async: Boolean = asyncDefault()) = clickCommonButton("cancel", async)
+fun Container.clickYes(async: Boolean = asyncDefault()) = clickCommonButton("yes", async)
+fun Container.clickNo(async: Boolean = asyncDefault()) = clickCommonButton("no", async)
 
 private fun Container.clickCommonButton(text: String, async: Boolean) =
     clickChild<AbstractButton>(async = async, text = text)
@@ -28,7 +31,7 @@ private fun Container.clickCommonButton(text: String, async: Boolean) =
 inline fun <reified T : AbstractButton> Container.clickChild(
     name: String? = null,
     text: String? = null,
-    async: Boolean = true,
+    async: Boolean = asyncDefault(),
     noinline filterFn: ((T) -> Boolean)? = null,
 ) {
     clickChild(T::class.java, name, text, async, filterFn)
@@ -53,7 +56,7 @@ fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    async: Boolean = true,
+    async: Boolean = asyncDefault(),
     filterFn: ((T) -> Boolean)? = null,
 ) {
     val child = getChild(clazz, name, text, filterFn)
@@ -68,7 +71,7 @@ fun <T : AbstractButton> Container.clickChild(
 fun Container.clickButton(
     name: String? = null,
     text: String? = null,
-    async: Boolean = true,
+    async: Boolean = asyncDefault(),
     filterFn: ((JButton) -> Boolean)? = null,
 ) {
     clickChild<JButton>(name, text, async, filterFn)

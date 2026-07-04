@@ -59,7 +59,7 @@ com.github.alyssaburlton.swingtest.NoSuchComponentException: Found 0 JButtons. T
 Component tree:
 
 JPanel - FlowLayout
-|- JRadioButton - "A"
+|- 👁 JRadioButton - "A"
 ```
 
 These can also be generated manually via the extension method `Container.generateComponentTree()`
@@ -84,7 +84,11 @@ class MyClassTest {
 }
 ```
 
-Windows in Java Swing also have the concept of being `modal`, meaning they block the thread that launched them until they are closed. To avoid blocking your tests, an `async` parameter exists on all component interactions. This will do the interaction in an `invokeLater()` before flushing the EDT, allowing your test to continue unimpeded whilst still guaranteeing that the interaction has completed. A full demonstration of how this works can be found in the [ModalDialogTest example](src/test/kotlin/com/github/alyssaburlton/swingtest/ModalDialogTest.kt)
+Windows in Java Swing also have the concept of being `modal`, meaning they block the thread that launched them until they are closed. To avoid blocking your tests, an `async` parameter exists on all component interactions. This will do the interaction in an `invokeLater()` before flushing the EDT, allowing your test to continue unimpeded whilst still guaranteeing that the interaction has completed. 
+
+The `async` property defaults to true if omitted. This default can be changed globally by setting the system property `-DasyncInteractionByDefault=false`
+
+For many examples of working with modal dialogs, see the [JOptionPane examples](src/test/kotlin/com/github/alyssaburlton/swingtest/OptionPanesTest.kt)
 
 
 Snapshot Testing :camera_flash:
