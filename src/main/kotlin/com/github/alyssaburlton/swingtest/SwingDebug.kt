@@ -10,6 +10,7 @@ import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JScrollBar
 import javax.swing.JTable
 
@@ -34,7 +35,7 @@ private fun Container.generateComponentTree(prefix: String, constraintDesc: Stri
 }
 
 private fun Component.isBoringContainer() = this is JScrollBar || this is JTable || this is JComboBox<*>
-private fun Component.oneLineDescription(): String {
+fun Component.oneLineDescription(): String {
     val className = describeClass()
 
     val desc = when (this) {
@@ -59,6 +60,7 @@ private fun Component.oneLineDescription(): String {
             val columns = columnModel.columns.toList().map { it.headerValue }.joinToString()
             "$className - [$columns] - $rowCount rows"
         }
+        is JOptionPane -> "$className ($messageType) - ${layout?.describeClass()}"
         is JComponent -> {
             val toolTipDesc = toolTipText?.let { """ - "$it"""" } ?: ""
             """$className$toolTipDesc - ${layout?.describeClass()}"""
@@ -67,10 +69,12 @@ private fun Component.oneLineDescription(): String {
         else -> className
     }
 
+    val visibleDesc = if (isVisible) { "\uD83D\uDC41 $desc" } else desc
+
     return if (name != null) {
-        "$desc [name: $name]"
+        "$visibleDesc [name: $name]"
     } else {
-        desc
+        visibleDesc
     }
 }
 

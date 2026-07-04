@@ -47,16 +47,16 @@ class ComponentFindersTest {
             Found 2 JFrames, expected 1 or 0:
 
             JFrame - "One" - BorderLayout [name: frame0]
-            |- [Center] JRootPane - RootLayout
+            |- [Center] 👁 JRootPane - RootLayout
               |- JPanel - FlowLayout [name: null.glassPane]
-              |- JLayeredPane - null [name: null.layeredPane]
-                |- JPanel - javax.swing.JRootPane${'$'}1 [name: null.contentPane]
+              |- 👁 JLayeredPane - null [name: null.layeredPane]
+                |- 👁 JPanel - javax.swing.JRootPane${'$'}1 [name: null.contentPane]
             ------
             JFrame - "Two" - BorderLayout [name: frame1]
-            |- [Center] JRootPane - RootLayout
+            |- [Center] 👁 JRootPane - RootLayout
               |- JPanel - FlowLayout [name: null.glassPane]
-              |- JLayeredPane - null [name: null.layeredPane]
-                |- JPanel - javax.swing.JRootPane${'$'}1 [name: null.contentPane]
+              |- 👁 JLayeredPane - null [name: null.layeredPane]
+                |- 👁 JPanel - javax.swing.JRootPane${'$'}1 [name: null.contentPane]
 
         """.trimIndent()
     }
@@ -113,9 +113,9 @@ class ComponentFindersTest {
 
             Component tree:
             
-            JPanel - FlowLayout
-            |- JButton - "A"
-            |- JButton - "B"
+            👁 JPanel - FlowLayout
+            |- 👁 JButton - "A"
+            |- 👁 JButton - "B"
             
         """.trimIndent()
     }
@@ -141,9 +141,9 @@ class ComponentFindersTest {
 
             Component tree:
 
-            JPanel - FlowLayout
-            |- JButton - "Button" [name: ButtonOne]
-            |- JButton - "Button" [name: ButtonOne]
+            👁 JPanel - FlowLayout
+            |- 👁 JButton - "Button" [name: ButtonOne]
+            |- 👁 JButton - "Button" [name: ButtonOne]
             
         """.trimIndent()
     }
@@ -248,8 +248,8 @@ class ComponentFindersTest {
 
             Component tree:
 
-            JPanel - FlowLayout
-            |- JRadioButton - "A"
+            👁 JPanel - FlowLayout
+            |- 👁 JRadioButton - "A"
             
         """.trimIndent()
     }

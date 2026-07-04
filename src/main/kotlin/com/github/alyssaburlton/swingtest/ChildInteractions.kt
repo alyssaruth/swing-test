@@ -2,16 +2,15 @@ package com.github.alyssaburlton.swingtest
 
 import java.awt.Container
 import javax.swing.AbstractButton
+import javax.swing.JButton
 
-fun Container.clickOk(async: Boolean = false) = clickCommonButton("ok", async)
-fun Container.clickCancel(async: Boolean = false) = clickCommonButton("cancel", async)
-fun Container.clickYes(async: Boolean = false) = clickCommonButton("yes", async)
-fun Container.clickNo(async: Boolean = false) = clickCommonButton("no", async)
+fun Container.clickOk(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("ok", async)
+fun Container.clickCancel(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("cancel", async)
+fun Container.clickYes(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("yes", async)
+fun Container.clickNo(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("no", async)
 
 private fun Container.clickCommonButton(text: String, async: Boolean) =
-    clickChild<AbstractButton>(async = async) {
-        it.text.equals(text, ignoreCase = true)
-    }
+    clickChild<AbstractButton>(async = async, text = text)
 
 /**
  * Simulate a click on a child component, recursing through child containers.
@@ -29,7 +28,7 @@ private fun Container.clickCommonButton(text: String, async: Boolean) =
 inline fun <reified T : AbstractButton> Container.clickChild(
     name: String? = null,
     text: String? = null,
-    async: Boolean = false,
+    async: Boolean = ASYNC_BY_DEFAULT,
     noinline filterFn: ((T) -> Boolean)? = null,
 ) {
     clickChild(T::class.java, name, text, async, filterFn)
@@ -54,8 +53,23 @@ fun <T : AbstractButton> Container.clickChild(
     clazz: Class<T>,
     name: String? = null,
     text: String? = null,
-    async: Boolean = false,
+    async: Boolean = ASYNC_BY_DEFAULT,
     filterFn: ((T) -> Boolean)? = null,
-) = maybeAsync(async) {
-    getChild(clazz, name, text, filterFn).doClick()
+) {
+    val child = getChild(clazz, name, text, filterFn)
+    maybeAsync(async) {
+        child.doClick()
+    }
+}
+
+/**
+ * Specific overload for buttons
+ */
+fun Container.clickButton(
+    name: String? = null,
+    text: String? = null,
+    async: Boolean = ASYNC_BY_DEFAULT,
+    filterFn: ((JButton) -> Boolean)? = null,
+) {
+    clickChild<JButton>(name, text, async, filterFn)
 }

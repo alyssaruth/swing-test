@@ -13,8 +13,6 @@ import javax.imageio.ImageIO
 import javax.swing.Icon
 import javax.swing.JComponent
 
-const val ENV_UPDATE_SNAPSHOT = "updateSnapshots"
-const val ENV_SCREENSHOT_OS = "screenshotOs"
 private const val DEFAULT_WIDTH = 200
 private const val DEFAULT_HEIGHT = 200
 
@@ -55,7 +53,7 @@ private fun JComponent.getHeightForSnapshot(): Int = when {
 fun JComponent.shouldMatchImage(imageName: String, pixelTolerance: Double = 0.01, failingPixelsThreshold: Double = 0.0) {
     verifyOs()
 
-    val overwrite = System.getProperty(ENV_UPDATE_SNAPSHOT) == "true"
+    val overwrite = System.getProperty(UPDATE_SNAPSHOT_PROP) == "true"
     val img = toBufferedImage()
 
     val stackFrames = Throwable().stackTrace.toList()
@@ -101,7 +99,7 @@ private fun ImageComparisonResult.differencePercentString(): String {
 }
 
 private fun verifyOs() {
-    val osForScreenshots = (System.getProperty(ENV_SCREENSHOT_OS) ?: "").lowercase()
+    val osForScreenshots = (System.getProperty(SCREENSHOT_OS_PROP) ?: "").lowercase()
 
     val os = System.getProperty("os.name").lowercase()
     if (osForScreenshots.isNotEmpty()) {

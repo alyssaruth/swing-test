@@ -29,6 +29,7 @@ class SwingDebugTest {
         panel.layout = BorderLayout(0, 0)
         val buttonPanel = JPanel()
         buttonPanel.add(JButton("Ok"))
+        buttonPanel.add(JButton("Hidden").also { it.isVisible = false })
         buttonPanel.add(JButton("Cancel"))
         panel.add(buttonPanel, BorderLayout.SOUTH)
 
@@ -57,22 +58,23 @@ class SwingDebugTest {
         val tree = frame.generateComponentTree()
         tree shouldBe """
             JFrame - "A Window" - BorderLayout [name: MyFrame]
-            |- [Center] JRootPane - RootLayout
+            |- [Center] 👁 JRootPane - RootLayout
               |- JPanel - FlowLayout [name: null.glassPane]
-              |- JLayeredPane - null [name: null.layeredPane]
-                |- JPanel - BorderLayout
-                  |- [South] JPanel - FlowLayout
-                    |- JButton - "Ok"
-                    |- JButton - "Cancel"
-                  |- [North] JPanel - FlowLayout
-                    |- JLabel - "Filter:"
-                    |- JComboBox<String> - 2 items (Selected: One)
-                  |- [Center] JScrollPane - UIResource
-                    |- JViewport - ViewportLayout
-                      |- JTable - [Index, Name, Value] - 2 rows
-                    |- ScrollBar - VERTICAL
-                    |- ScrollBar - HORIZONTAL
-
+              |- 👁 JLayeredPane - null [name: null.layeredPane]
+                |- 👁 JPanel - BorderLayout
+                  |- [South] 👁 JPanel - FlowLayout
+                    |- 👁 JButton - "Ok"
+                    |- JButton - "Hidden"
+                    |- 👁 JButton - "Cancel"
+                  |- [North] 👁 JPanel - FlowLayout
+                    |- 👁 JLabel - "Filter:"
+                    |- 👁 JComboBox<String> - 2 items (Selected: One)
+                  |- [Center] 👁 JScrollPane - UIResource
+                    |- 👁 JViewport - ViewportLayout
+                      |- 👁 JTable - [Index, Name, Value] - 2 rows
+                    |- 👁 ScrollBar - VERTICAL
+                    |- 👁 ScrollBar - HORIZONTAL
+        
         """.trimIndent()
     }
 
@@ -85,46 +87,47 @@ class SwingDebugTest {
         flushEdt()
 
         val window = findWindow<JDialog> { it.title == "Open" }!!
+        window.name = "dialog0"
         val tree = window.generateComponentTree()
         tree shouldBe """
-            JDialog - "Open" - BorderLayout [name: dialog0]
-            |- [Center] JRootPane - RootLayout
+            👁 JDialog - "Open" - BorderLayout [name: dialog0]
+            |- [Center] 👁 JRootPane - RootLayout
               |- JPanel - FlowLayout [name: null.glassPane]
-              |- JLayeredPane - null [name: null.layeredPane]
-                |- JPanel - BorderLayout [name: null.contentPane]
-                  |- [Center] JFileChooser - BorderLayout
-                    |- [North] JPanel - BorderLayout
-                      |- [After] JPanel - BoxLayout
-                        |- JButton - "null" (ToolTip: "Up One Level")
-                        |- Filler - null
-                        |- JButton - "" (ToolTip: "Home")
-                        |- Filler - null
-                        |- JButton - "null" (ToolTip: "Create New Folder")
-                        |- Filler - null
-                        |- JToggleButton - "" (ToolTip: "List")
-                        |- JToggleButton - "" (ToolTip: "Details")
-                      |- [Before] JLabel - "Look In:"
-                      |- [Center]  JComboBox<File> - 1 items (Selected: /)
-                    |- [After] JPanel - BorderLayout
-                    |- [Center] FilePane - BorderLayout
-                      |- [Center] JPanel - BorderLayout
-                        |- [Center] JScrollPane - UIResource
-                          |- JViewport - ViewportLayout
-                            |- sun.swing.FilePane${'$'}4 - null
+              |- 👁 JLayeredPane - null [name: null.layeredPane]
+                |- 👁 JPanel - BorderLayout [name: null.contentPane]
+                  |- [Center] 👁 JFileChooser - BorderLayout
+                    |- [North] 👁 JPanel - BorderLayout
+                      |- [After] 👁 JPanel - BoxLayout
+                        |- 👁 JButton - "null" (ToolTip: "Up One Level")
+                        |- 👁 Filler - null
+                        |- 👁 JButton - "" (ToolTip: "Home")
+                        |- 👁 Filler - null
+                        |- 👁 JButton - "null" (ToolTip: "Create New Folder")
+                        |- 👁 Filler - null
+                        |- 👁 JToggleButton - "" (ToolTip: "List")
+                        |- 👁 JToggleButton - "" (ToolTip: "Details")
+                      |- [Before] 👁 JLabel - "Look In:"
+                      |- [Center]  👁 JComboBox<File> - 1 items (Selected: /)
+                    |- [After] 👁 JPanel - BorderLayout
+                    |- [Center] 👁 FilePane - BorderLayout
+                      |- [Center] 👁 JPanel - BorderLayout
+                        |- [Center] 👁 JScrollPane - UIResource
+                          |- 👁 JViewport - ViewportLayout
+                            |- 👁 sun.swing.FilePane$4 - null
                               |- CellRendererPane - null
                           |- ScrollBar - VERTICAL
                           |- ScrollBar - HORIZONTAL
-                    |- [South] JPanel - BoxLayout
-                      |- JPanel - BoxLayout
-                        |- AlignedLabel - "File Name:"
-                        |- javax.swing.plaf.metal.MetalFileChooserUI${'$'}3 - UpdateHandler
-                      |- Filler - null
-                      |- JPanel - BoxLayout
-                        |- AlignedLabel - "Files of Type:"
-                        |- JComboBox<AcceptAllFileFilter> - 1 items (Selected: javax.swing.plaf.basic.BasicFileChooserUI${'$'}AcceptAllFileFilter)
-                      |- JPanel - ButtonAreaLayout
-                        |- JButton - "Open" (ToolTip: "Open selected file")
-                        |- JButton - "Cancel" (ToolTip: "Abort file chooser dialog")
+                    |- [South] 👁 JPanel - BoxLayout
+                      |- 👁 JPanel - BoxLayout
+                        |- 👁 AlignedLabel - "File Name:"
+                        |- 👁 javax.swing.plaf.metal.MetalFileChooserUI$3 - UpdateHandler
+                      |- 👁 Filler - null
+                      |- 👁 JPanel - BoxLayout
+                        |- 👁 AlignedLabel - "Files of Type:"
+                        |- 👁 JComboBox<AcceptAllFileFilter> - 1 items (Selected: javax.swing.plaf.basic.BasicFileChooserUI${'$'}AcceptAllFileFilter)
+                      |- 👁 JPanel - ButtonAreaLayout
+                        |- 👁 JButton - "Open" (ToolTip: "Open selected file")
+                        |- 👁 JButton - "Cancel" (ToolTip: "Abort file chooser dialog")
 
         """.trimIndent()
     }
