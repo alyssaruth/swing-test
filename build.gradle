@@ -2,12 +2,12 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
     id "maven-publish"
+    id 'org.jreleaser' version '1.25.0'
     id 'java-library'
-    id 'signing'
     id 'org.jetbrains.dokka' version '0.10.1'
 }
 
-group 'com.github.alexburlton'
+group 'io.github.alyssaruth'
 version '5.0.0'
 
 repositories {
@@ -74,8 +74,8 @@ java {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId = 'com.github.alexburlton'
+        maven(MavenPublication) {
+            groupId = 'io.github.alyssaruth'
             artifactId = 'swing-test'
             version = '5.0.0'
             from components.java
@@ -83,7 +83,7 @@ publishing {
             pom {
                 name = 'swing-test'
                 description = 'Kotlin swing testing library'
-                url = 'https://github.com/alyssaburlton/swing-test'
+                url = 'https://github.com/alyssaruth/swing-test'
 
                 licenses {
                     license {
@@ -94,13 +94,15 @@ publishing {
 
                 developers {
                     developer {
-                        id = 'alyssaburlton'
-                        name = 'Alyssa Burlton'
+                        id = 'alyssaruth'
+                        name = 'Alyssa Burling'
                     }
                 }
 
                 scm {
-                    url = "https://github.com/alyssaburlton/swing-test"
+                    connection = 'scm:git:https://github.com/alyssaruth/swing-test.git'
+                    developerConnection = 'scm:git:ssh://github.com/alyssaruth/swing-test.git'
+                    url = "https://github.com/alyssaruth/swing-test"
                 }
             }
         }
@@ -108,16 +110,32 @@ publishing {
 
     repositories {
         maven {
-            name = "OSSRH"
-            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            credentials {
-                username = project.ossrhUsername
-                password = project.ossrhPassword
-            }
+            url = layout.buildDirectory.dir('staging-deploy')
         }
     }
 }
 
-signing {
-    sign publishing.publications.mavenJava
+jreleaser {
+    release {
+        github {
+            enabled = false
+        }
+    }
+    signing {
+        pgp {
+            active = 'ALWAYS'
+            armored = true
+        }
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'RELEASE'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    stagingRepository('build/staging-deploy')
+                }
+            }
+        }
+    }
 }

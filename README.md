@@ -54,7 +54,7 @@ Quality debugging with component trees :evergreen_tree:
 Many failing assertions will provide a useful error message that includes the component tree, for example:
 
 ```
-com.github.alyssaburlton.swingtest.NoSuchComponentException: Found 0 JButtons. Text [null], name [null]. 
+io.github.alyssaruth.swingtest.NoSuchComponentException: Found 0 JButtons. Text [null], name [null]. 
 
 Component tree:
 
@@ -88,7 +88,7 @@ Windows in Java Swing also have the concept of being `modal`, meaning they block
 
 The `async` property defaults to true if omitted. This default can be changed globally by setting the system property `-DasyncInteractionByDefault=false`
 
-For many examples of working with modal dialogs, see the [JOptionPane examples](src/test/kotlin/com/github/alyssaburlton/swingtest/OptionPanesTest.kt)
+For many examples of working with modal dialogs, see the [JOptionPane examples](src/test/kotlin/io/github/alyssaruth/swingtest/OptionPanesTest.kt)
 
 
 Snapshot Testing :camera_flash:
