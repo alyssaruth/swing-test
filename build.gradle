@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.github.alexburlton'
-version '4.0.0'
+version '5.0.0'
 
 repositories {
     mavenCentral()
@@ -77,7 +77,7 @@ publishing {
         mavenJava(MavenPublication) {
             groupId = 'com.github.alexburlton'
             artifactId = 'swing-test'
-            version = '4.0.0'
+            version = '5.0.0'
             from components.java
 
             pom {
