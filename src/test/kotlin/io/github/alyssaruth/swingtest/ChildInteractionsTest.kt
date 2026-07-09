@@ -1,5 +1,6 @@
 package io.github.alyssaruth.swingtest
 
+import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
@@ -7,6 +8,7 @@ import org.junit.jupiter.api.Test
 import java.awt.event.ActionListener
 import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 
 class ChildInteractionsTest {
     @Test
@@ -55,5 +57,23 @@ class ChildInteractionsTest {
 
         verify { listenerA.actionPerformed(any()) }
         verifyNotCalled { listenerB.actionPerformed(any()) }
+    }
+
+    @Test
+    fun `Should be able to select a tab by name`() {
+        val pane = JTabbedPane()
+        val panelA = JPanel().apply { name = "panelA" }
+        val panelB = JPanel().apply { name = "panelB" }
+        val panelC = JPanel().apply { name = "panelC" }
+
+        pane.addTab("A", panelA)
+        pane.addTab("B", panelB)
+        pane.addTab("C", panelC)
+
+        pane.selectedComponent shouldBe panelA
+
+
+        pane.selectTab<JPanel>("panelC")
+        pane.selectedComponent shouldBe panelC
     }
 }
