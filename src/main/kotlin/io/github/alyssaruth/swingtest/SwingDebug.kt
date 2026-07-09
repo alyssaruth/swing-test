@@ -60,7 +60,7 @@ fun Component.oneLineDescription(): String {
             val columns = columnModel.columns.toList().map { it.headerValue }.joinToString()
             "$className - [$columns] - $rowCount rows"
         }
-        is JOptionPane -> "$className ($messageType) - ${layout?.describeClass()}"
+        is JOptionPane -> "$className (${describeMessageType()}) - ${layout?.describeClass()}"
         is JComponent -> {
             val toolTipDesc = toolTipText?.let { """ - "$it"""" } ?: ""
             """$className$toolTipDesc - ${layout?.describeClass()}"""
@@ -84,3 +84,12 @@ private fun Any.describeClass() = javaClass.simpleName.ifEmpty { javaClass.name 
 
 private fun String.ifNotEmpty(transformer: (String) -> String): String =
     if (isNotEmpty()) transformer(this) else this
+
+private fun JOptionPane.describeMessageType() = when(messageType) {
+    JOptionPane.ERROR_MESSAGE -> "ERROR_MESSAGE"
+    JOptionPane.INFORMATION_MESSAGE -> "INFORMATION_MESSAGE"
+    JOptionPane.WARNING_MESSAGE -> "WARNING_MESSAGE"
+    JOptionPane.QUESTION_MESSAGE -> "QUESTION_MESSAGE"
+    JOptionPane.PLAIN_MESSAGE -> "PLAIN_MESSAGE"
+    else -> "UNKNOWN ($messageType)"
+}
