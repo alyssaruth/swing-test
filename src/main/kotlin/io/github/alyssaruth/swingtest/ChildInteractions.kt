@@ -1,8 +1,10 @@
 package io.github.alyssaruth.swingtest
 
+import java.awt.Component
 import java.awt.Container
 import javax.swing.AbstractButton
 import javax.swing.JButton
+import javax.swing.JTabbedPane
 
 fun Container.clickOk(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("ok", async)
 fun Container.clickCancel(async: Boolean = ASYNC_BY_DEFAULT) = clickCommonButton("cancel", async)
@@ -72,4 +74,13 @@ fun Container.clickButton(
     filterFn: ((JButton) -> Boolean)? = null,
 ) {
     clickChild<JButton>(name, text, async, filterFn)
+}
+
+
+inline fun <reified T : Component> JTabbedPane.selectTab(
+    name: String,
+    async: Boolean = ASYNC_BY_DEFAULT,
+    noinline filterFn: ((T) -> Boolean)? = null,
+) {
+    maybeAsync(async) { selectedComponent = getChild<T>(name, filterFn = filterFn) }
 }

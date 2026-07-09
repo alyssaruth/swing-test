@@ -297,4 +297,16 @@ class OptionPanesTest {
         dlg.getDialogMessage() shouldBe message
         dlg.dispose()
     }
+
+    @Test
+    fun `Can find OptionPane dialog among other unrelated JDialogs`() {
+        val dlg = JDialog().apply {
+            add(OptionPaneLauncher())
+            isVisible = true
+        }
+
+        dlg.clickButton(text = "Error")
+
+        expectErrorDialog("Something went wrong")
+    }
 }

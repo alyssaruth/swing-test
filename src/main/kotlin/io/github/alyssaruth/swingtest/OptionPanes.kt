@@ -9,7 +9,12 @@ import javax.swing.JOptionPane
 import javax.swing.text.JTextComponent
 
 /**
- * Question
+ * Wait for a JOptionPane dialog with messageType = QUESTION_MESSAGE to be visible, and answer it
+ *
+ * @param message - the expected dialog message
+ * @param answer - the button to press in response, e.g. "Yes"
+ * @param title (optional) - the expected title of the dialog
+ * @param timeout (optional) - how long to wait before giving up
  */
 fun waitForQuestionDialog(message: String, answer: String, title: String? = null, timeout: Int = 5000) {
     waitForOptionPaneDialog(JOptionPane.QUESTION_MESSAGE, title, timeout = timeout)
@@ -17,12 +22,23 @@ fun waitForQuestionDialog(message: String, answer: String, title: String? = null
     expectQuestionDialog(message, answer, title)
 }
 
+/**
+ * Expect a JOptionPane dialog with messageType = QUESTION_MESSAGE to be visible, and answer it
+ *
+ * @param message - the expected dialog message
+ * @param answer - the button to press in response, e.g. "Yes"
+ * @param title (optional) - the expected title of the dialog
+ */
 fun expectQuestionDialog(message: String, answer: String, title: String? = null) {
     expectOptionPaneDialog(JOptionPane.QUESTION_MESSAGE, message,  answer, title)
 }
 
 /**
- * Error
+ * Wait for a JOptionPane dialog with messageType = ERROR_MESSAGE to be visible, and Ok it
+ *
+ * @param message - the expected dialog message
+ * @param title (optional) - the expected title of the dialog
+ * @param timeout (optional) - how long to wait before giving up
  */
 fun waitForErrorDialog(message: String, title: String? = null, timeout: Int = 5000) {
     waitForOptionPaneDialog(JOptionPane.ERROR_MESSAGE, title, timeout = timeout)
@@ -30,18 +46,35 @@ fun waitForErrorDialog(message: String, title: String? = null, timeout: Int = 50
     expectErrorDialog(message, title)
 }
 
+/**
+ * Expect a JOptionPane dialog with messageType = ERROR_MESSAGE to be visible, and Ok it
+ *
+ * @param message - the expected dialog message
+ * @param title (optional) - the expected title of the dialog
+ */
 fun expectErrorDialog(message: String, title: String? = null) {
     expectOptionPaneDialog(JOptionPane.ERROR_MESSAGE, message, "Ok", title)
 }
 
 /**
- * Info
+ * Wait for a JOptionPane dialog with messageType = INFORMATION_MESSAGE to be visible, and Ok it
+ *
+ * @param message - the expected dialog message
+ * @param title (optional) - the expected title of the dialog
+ * @param timeout (optional) - how long to wait before giving up
  */
 fun waitForInfoDialog(message: String, title: String? = null, timeout: Int = 5000) {
     waitForOptionPaneDialog(JOptionPane.INFORMATION_MESSAGE, title, timeout = timeout)
 
     expectInfoDialog(message)
 }
+
+/**
+ * Expect a JOptionPane dialog with messageType = INFORMATION_MESSAGE to be visible, and Ok it
+ *
+ * @param message - the expected dialog message
+ * @param title (optional) - the expected title of the dialog
+ */
 fun expectInfoDialog(message: String, title: String? = null) {
     expectOptionPaneDialog(JOptionPane.INFORMATION_MESSAGE, message, "Ok", title)
 }
@@ -53,7 +86,12 @@ private fun expectOptionPaneDialog(messageType: Int, message: String, buttonText
 }
 
 /**
- * Input
+ * Expect a JOptionPane dialog with the specified messageType to be visible. Type the desired text into its input and Ok it.
+ *
+ * @param message - the expected dialog message
+ * @param text - the text to type in response
+ * @param messageType (optional) - the messageType, e.g. JOptionPane.PLAIN_MESSAGE
+ * @param title (optional) - the expected title of the dialog
  */
 fun typeIntoInputDialog(message: String, text: String, messageType: Int = JOptionPane.PLAIN_MESSAGE, title: String? = null) {
     waitForOptionPaneDialog(messageType, title, timeout = 1000)
@@ -63,6 +101,14 @@ fun typeIntoInputDialog(message: String, text: String, messageType: Int = JOptio
     dlg.clickOk(async = true)
 }
 
+/**
+ * Expect a JOptionPane dialog with the specified messageType to be visible. Select the desired option from its JComboBox or JList, and Ok it.
+ *
+ * @param message - the expected dialog message
+ * @param value - the value to select from the JComboBox / JList (which is shown depends on the total number of options)
+ * @param messageType (optional) - the messageType, e.g. JOptionPane.PLAIN_MESSAGE
+ * @param title (optional) - the expected title of the dialog
+ */
 inline fun <reified E : Any> selectOptionFromInputDialog(message: String, value: E, messageType: Int = JOptionPane.PLAIN_MESSAGE, title: String? = null) {
     waitForOptionPaneDialog(messageType, title, timeout = 1000)
 
@@ -99,7 +145,7 @@ inline fun <reified E> JList<E>.items(): List<E> {
 fun <K> JComboBox<K>.items() = (0 until model.size).map { model.getElementAt(it) }
 
 fun getOptionPaneDialog(type: Int, title: String? = null) =
-    getWindow<JDialog> { it.isVisible && it.getChild<JOptionPane>().messageType == type && (title == null || it.title == title) }
+    getWindow<JDialog> { it.isVisible && it.findChild<JOptionPane>()?.messageType == type && (title == null || it.title == title) }
 
 fun waitForOptionPaneDialog(type: Int, title: String? = null, timeout: Int = 5000) {
     waitForAssertion(timeout) { getOptionPaneDialog(type, title) }
